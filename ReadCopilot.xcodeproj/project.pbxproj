@@ -1,0 +1,378 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0A6BF239EBB4AA7AD14A52F1 /* ReadCopilotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909BBBF934E289E09753F075 /* ReadCopilotApp.swift */; };
+		2CB085C8CA50EEB9E6ECB6C8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BEFC863405C3EF42F6D06C /* SettingsView.swift */; };
+		33F5D951E06D01720199238A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA818FC7F01D6457ACC4DC9 /* RootView.swift */; };
+		477A0D4BE0B65001CE37DFDF /* LLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81EB87D09B9A7304212F9D14 /* LLMClient.swift */; };
+		6EDE20515481114347AA3BA2 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180C32923FA2016BE8D39DF1 /* Keychain.swift */; };
+		7B6535EEC853F898E17B6619 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E4896B1633BD4712B27FB1 /* Theme.swift */; };
+		7D263311D0A96BCC26EDB787 /* WeReadGateway.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6AF336A92DBD256AC1F59CA /* WeReadGateway.swift */; };
+		C04B33713E3760832F220843 /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A2E8637FDAC87554648B41A /* LibraryStore.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		180C32923FA2016BE8D39DF1 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
+		354B24DBC2FF9F98B540EBF3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3BA818FC7F01D6457ACC4DC9 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		6A2E8637FDAC87554648B41A /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStore.swift; sourceTree = "<group>"; };
+		81EB87D09B9A7304212F9D14 /* LLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMClient.swift; sourceTree = "<group>"; };
+		81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ReadCopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		909BBBF934E289E09753F075 /* ReadCopilotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadCopilotApp.swift; sourceTree = "<group>"; };
+		B0BEFC863405C3EF42F6D06C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		C6AF336A92DBD256AC1F59CA /* WeReadGateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeReadGateway.swift; sourceTree = "<group>"; };
+		F9E4896B1633BD4712B27FB1 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		1326E2F2941E588E2BA58B48 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				909BBBF934E289E09753F075 /* ReadCopilotApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		34106ABEE1565537F84DB2B1 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				3BA818FC7F01D6457ACC4DC9 /* RootView.swift */,
+				B0BEFC863405C3EF42F6D06C /* SettingsView.swift */,
+				F9E4896B1633BD4712B27FB1 /* Theme.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		44F0D7B2C0829BC8503A9A5F /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				81EB87D09B9A7304212F9D14 /* LLMClient.swift */,
+				C6AF336A92DBD256AC1F59CA /* WeReadGateway.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		79BF2EE2840DF920367CF19F /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				6A2E8637FDAC87554648B41A /* LibraryStore.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
+		875D6D867598B23A35D6D71B /* ReadCopilot */ = {
+			isa = PBXGroup;
+			children = (
+				354B24DBC2FF9F98B540EBF3 /* Info.plist */,
+				1326E2F2941E588E2BA58B48 /* App */,
+				79BF2EE2840DF920367CF19F /* Data */,
+				44F0D7B2C0829BC8503A9A5F /* Networking */,
+				AA284D1856BDEFE23E56679E /* Security */,
+				34106ABEE1565537F84DB2B1 /* UI */,
+			);
+			path = ReadCopilot;
+			sourceTree = "<group>";
+		};
+		98A25D685AB1AA4D2805178E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		AA284D1856BDEFE23E56679E /* Security */ = {
+			isa = PBXGroup;
+			children = (
+				180C32923FA2016BE8D39DF1 /* Keychain.swift */,
+			);
+			path = Security;
+			sourceTree = "<group>";
+		};
+		B5CCF26A42BE2D452DEBA753 = {
+			isa = PBXGroup;
+			children = (
+				875D6D867598B23A35D6D71B /* ReadCopilot */,
+				98A25D685AB1AA4D2805178E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3F39448E4E3B50BB4D2374FE /* ReadCopilot */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8540E529F3BA10D91CC5561D /* Build configuration list for PBXNativeTarget "ReadCopilot" */;
+			buildPhases = (
+				C62A25CD9468D09B9E8A416A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ReadCopilot;
+			packageProductDependencies = (
+			);
+			productName = ReadCopilot;
+			productReference = 81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A73D3DC82388852AB9755557 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					3F39448E4E3B50BB4D2374FE = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 6D4014FFD779CDAB89BD365D /* Build configuration list for PBXProject "ReadCopilot" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = B5CCF26A42BE2D452DEBA753;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 98A25D685AB1AA4D2805178E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3F39448E4E3B50BB4D2374FE /* ReadCopilot */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C62A25CD9468D09B9E8A416A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6EDE20515481114347AA3BA2 /* Keychain.swift in Sources */,
+				477A0D4BE0B65001CE37DFDF /* LLMClient.swift in Sources */,
+				C04B33713E3760832F220843 /* LibraryStore.swift in Sources */,
+				0A6BF239EBB4AA7AD14A52F1 /* ReadCopilotApp.swift in Sources */,
+				33F5D951E06D01720199238A /* RootView.swift in Sources */,
+				2CB085C8CA50EEB9E6ECB6C8 /* SettingsView.swift in Sources */,
+				7B6535EEC853F898E17B6619 /* Theme.swift in Sources */,
+				7D263311D0A96BCC26EDB787 /* WeReadGateway.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		22BC3E39942BED07C65BD380 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = ReadCopilot/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.readcopilot.ReadCopilot;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		597982890D2014624FD245E6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = ReadCopilot;
+				SDKROOT = auto;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7EA45C9E5A13158E527BDED7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = ReadCopilot;
+				SDKROOT = auto;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A3342DC86BFFEB85876A6152 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = ReadCopilot/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.readcopilot.ReadCopilot;
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6D4014FFD779CDAB89BD365D /* Build configuration list for PBXProject "ReadCopilot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				597982890D2014624FD245E6 /* Debug */,
+				7EA45C9E5A13158E527BDED7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8540E529F3BA10D91CC5561D /* Build configuration list for PBXNativeTarget "ReadCopilot" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A3342DC86BFFEB85876A6152 /* Debug */,
+				22BC3E39942BED07C65BD380 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A73D3DC82388852AB9755557 /* Project object */;
+}

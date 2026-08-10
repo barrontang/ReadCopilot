@@ -1,0 +1,32 @@
+name: ReadCopilot
+options:
+  bundleIdPrefix: com.readcopilot
+  deploymentTarget:
+    macOS: "14.0"
+    iOS: "17.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    GENERATE_INFOPLIST_FILE: YES
+    PRODUCT_NAME: ReadCopilot
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Automatic
+targets:
+  ReadCopilot:
+    type: application
+    supportedDestinations: [macOS, iOS]
+    sources:
+      - path: ReadCopilot
+    info:
+      path: ReadCopilot/Info.plist
+      properties:
+        CFBundleDisplayName: ReadCopilot
+        LSApplicationCategoryType: public.app-category.productivity
+    settings:
+      base:
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ENABLE_HARDENED_RUNTIME: YES
