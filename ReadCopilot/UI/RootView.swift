@@ -60,15 +60,51 @@ struct RootView: View {
     }
 }
 
+// MARK: - 排序规则
+enum BookSortOrder: String, CaseIterable, Identifiable {
+    case recentRead  = "最近阅读"
+    case titleAZ     = "书名 A-Z"
+    case authorAZ    = "作者 A-Z"
+    case finishedFirst = "读完优先"
+    var id: String { rawValue }
+    var icon: String {
+        switch self {
+        case .recentRead:    return "clock"
+        case .titleAZ:       return "character"
+        case .authorAZ:      return "person"
+        case .finishedFirst: return "checkmark.seal"
+        }
+    }
+}
+
 // MARK: - 列表栏:真实书库
 struct BookListColumn: View {
     @ObservedObject var store: LibraryStore
     @Binding var selectedBook: LibraryBook?
     @State private var query = ""
+    @State private var sortOrder: BookSortOrder = .recentRead
+    @State private var showFinishedOnly = false
 
     var filtered: [LibraryBook] {
-        query.isEmpty ? store.books :
-            store.books.filter { $0.title.contains(query) || $0.author.contains(query) }
+        var list = store.books
+        // 筛选
+        if showFinishedOnly { list = list.filter { $0.finished } }
+        if !query.isEmpty   { list = list.filter { $0.title.contains(query) || $0.author.contains(query) } }
+        // 排序
+        switch sortOrder {
+        case .recentRead:
+            list.sort { $0.readUpdateTime > $1.readUpdateTime }
+        case .titleAZ:
+            list.sort { $0.title.localizedCompare($1.title) == .orderedAscending }
+        case .authorAZ:
+            list.sort { $0.author.localizedCompare($1.author) == .orderedAscending }
+        case .finishedFirst:
+            list.sort {
+                if $0.finished != $1.finished { return $0.finished }
+                return $0.readUpdateTime > $1.readUpdateTime
+            }
+        }
+        return list
     }
 
     var body: some View {
@@ -106,16 +142,61 @@ struct BookListColumn: View {
                     .padding(.vertical, 3).tag(book)
                 }
                 .searchable(text: $query, prompt: "搜索书名或作者")
+                // footer:显示当前条目数,方便核对全量
+                .safeAreaInset(edge: .bottom) {
+                    HStack {
+                        Text(footerText)
+                            .font(.caption).foregroundStyle(Theme.inkSecondary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16).padding(.vertical, 8)
+                    .background(.ultraThinMaterial)
+                }
             }
         }
         .navigationTitle("书库")
         .toolbar {
-            ToolbarItem {
+            // 排序菜单
+            ToolbarItem(placement: .automatic) {
+                Menu {
+                    Section("排序方式") {
+                        ForEach(BookSortOrder.allCases) { order in
+                            Button {
+                                sortOrder = order
+                            } label: {
+                                Label(order.rawValue, systemImage: order.icon)
+                                if sortOrder == order { Image(systemName: "checkmark") }
+                            }
+                        }
+                    }
+                    Divider()
+                    Section("筛选") {
+                        Toggle(isOn: $showFinishedOnly) {
+                            Label("只看已读完", systemImage: "checkmark.seal")
+                        }
+                    }
+                } label: {
+                    Image(systemName: sortOrder == .recentRead && !showFinishedOnly
+                          ? "line.3.horizontal.decrease.circle"
+                          : "line.3.horizontal.decrease.circle.fill")
+                }
+            }
+            // 刷新
+            ToolbarItem(placement: .automatic) {
                 Button { Task { await store.syncAll() } } label: {
                     Image(systemName: "arrow.clockwise")
                 }.disabled(store.loading)
             }
         }
+    }
+
+    private var footerText: String {
+        let total = store.totalShelfItems
+        let showing = filtered.count
+        if showFinishedOnly || !query.isEmpty {
+            return "显示 \(showing) 本 · 书架共 \(total) 个条目"
+        }
+        return "书架共 \(total) 个条目(\(store.bookCount) 本电子书 + \(store.albumCount) 个有声书\(store.hasMPCollection ? " + 1 文章收藏" : ""))"
     }
 }
 
