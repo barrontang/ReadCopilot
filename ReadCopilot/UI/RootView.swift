@@ -184,27 +184,108 @@ struct DashboardColumn: View {
     }
 }
 
-// MARK: - 详情栏:诊断报告(占位,M1 下一步接 LLM)
+// MARK: - 详情栏:诊断报告(真实 LLM)
 struct DiagnosisColumn: View {
     let book: LibraryBook
+    @StateObject private var model = DiagnosisModel()
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+
+                // 书名 / 作者
                 VStack(alignment: .leading, spacing: 6) {
                     Text(book.title).font(Theme.serifTitle(26)).foregroundStyle(Theme.ink)
                     Text("\(book.author)\(book.category.isEmpty ? "" : " · \(book.category)")")
                         .font(Theme.body(13)).foregroundStyle(Theme.inkSecondary)
                 }
                 Divider().background(Theme.hairline)
-                Text("笔记写作诊断将在此生成(需先配置 LLM Key)。\n下一步:拉取本书的划线与想法 → 结构化喂给 LLM → 输出思考模式判定 + 写作建议 + 延伸追问。")
-                    .font(Theme.body(15)).foregroundStyle(Theme.ink).lineSpacing(6)
+
+                // 状态区
+                switch model.state {
+                case .idle:
+                    Text("点击下方按钮,拉取你在这本书的划线与想法,由 AI 生成阅读诊断报告。")
+                        .font(Theme.body(15)).foregroundStyle(Theme.inkSecondary).lineSpacing(6)
+
+                case .fetchingNotes:
+                    HStack(spacing: 10) {
+                        ProgressView().controlSize(.small)
+                        Text("正在拉取划线与想法…").font(Theme.body(14)).foregroundStyle(Theme.inkSecondary)
+                    }
+
+                case .generating:
+                    HStack(spacing: 10) {
+                        ProgressView().controlSize(.small)
+                        Text("AI 正在生成诊断报告…").font(Theme.body(14)).foregroundStyle(Theme.inkSecondary)
+                    }
+
+                case .done:
+                    // Markdown 报告(简单渲染:##标题 + 正文)
+                    ReportView(markdown: model.report)
+
+                case .failed(let msg):
+                    VStack(alignment: .leading, spacing: 10) {
+                        Label("诊断失败", systemImage: "exclamationmark.triangle")
+                            .font(Theme.body(15)).foregroundStyle(.red)
+                        Text(msg).font(Theme.body(13)).foregroundStyle(Theme.inkSecondary)
+                    }
+                }
+
+                Spacer(minLength: 16)
+
+                // 生成按钮(idle / done / failed 时可点)
+                let canRun = model.state == .idle || model.state == .done
+                    || { if case .failed = model.state { return true } else { return false } }()
                 Button {
-                } label: { Label("生成诊断", systemImage: "sparkles").font(Theme.body(14)) }
-                    .buttonStyle(.borderedProminent).tint(Theme.accent)
+                    Task { await model.run(book: book) }
+                } label: {
+                    Label(model.state == .done ? "重新生成" : "生成诊断",
+                          systemImage: "sparkles")
+                        .font(Theme.body(14))
+                }
+                .buttonStyle(.borderedProminent).tint(Theme.accent)
+                .disabled(!canRun)
             }
             .padding(28).frame(maxWidth: 680, alignment: .leading)
         }
         .background(Theme.panel)
+        // 切换不同书时重置状态
+        .id(book.id)
+    }
+}
+
+// MARK: - 简单 Markdown 渲染(## 标题 + 正文段落)
+struct ReportView: View {
+    let markdown: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            ForEach(Array(paragraphs.enumerated()), id: \.offset) { _, para in
+                if para.isHeading {
+                    Text(para.text)
+                        .font(Theme.serifTitle(18))
+                        .foregroundStyle(Theme.accent)
+                        .padding(.top, 6)
+                } else {
+                    Text(para.text)
+                        .font(Theme.body(15))
+                        .foregroundStyle(Theme.ink)
+                        .lineSpacing(7)
+                }
+            }
+        }
+    }
+
+    struct Para { let text: String; let isHeading: Bool }
+
+    var paragraphs: [Para] {
+        markdown.components(separatedBy: "\n")
+            .map { line -> Para in
+                let t = line.trimmingCharacters(in: .whitespaces)
+                if t.hasPrefix("## ") { return Para(text: String(t.dropFirst(3)), isHeading: true) }
+                if t.hasPrefix("# ")  { return Para(text: String(t.dropFirst(2)), isHeading: true) }
+                return Para(text: t, isHeading: false)
+            }
+            .filter { !$0.text.isEmpty }
     }
 }

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0A6BF239EBB4AA7AD14A52F1 /* ReadCopilotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909BBBF934E289E09753F075 /* ReadCopilotApp.swift */; };
 		2CB085C8CA50EEB9E6ECB6C8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BEFC863405C3EF42F6D06C /* SettingsView.swift */; };
+		2D062DF9C5025390D80786A7 /* DiagnosisModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */; };
 		33F5D951E06D01720199238A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA818FC7F01D6457ACC4DC9 /* RootView.swift */; };
 		477A0D4BE0B65001CE37DFDF /* LLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81EB87D09B9A7304212F9D14 /* LLMClient.swift */; };
 		6EDE20515481114347AA3BA2 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180C32923FA2016BE8D39DF1 /* Keychain.swift */; };
@@ -20,6 +21,7 @@
 /* Begin PBXFileReference section */
 		180C32923FA2016BE8D39DF1 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
 		354B24DBC2FF9F98B540EBF3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosisModel.swift; sourceTree = "<group>"; };
 		3BA818FC7F01D6457ACC4DC9 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		6A2E8637FDAC87554648B41A /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStore.swift; sourceTree = "<group>"; };
 		81EB87D09B9A7304212F9D14 /* LLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMClient.swift; sourceTree = "<group>"; };
@@ -61,6 +63,7 @@
 		79BF2EE2840DF920367CF19F /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */,
 				6A2E8637FDAC87554648B41A /* LibraryStore.swift */,
 			);
 			path = Data;
@@ -162,6 +165,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2D062DF9C5025390D80786A7 /* DiagnosisModel.swift in Sources */,
 				6EDE20515481114347AA3BA2 /* Keychain.swift in Sources */,
 				477A0D4BE0B65001CE37DFDF /* LLMClient.swift in Sources */,
 				C04B33713E3760832F220843 /* LibraryStore.swift in Sources */,
