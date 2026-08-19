@@ -10,7 +10,7 @@
 
 ## ✨ 这是什么
 
-ReadCopilot 不是另一个“读书统计工具”。  
+ReadCopilot 不是另一个"读书统计工具"。  
 它更像一个 **阅读副驾**：
 
 - 帮你判断笔记写得好不好
@@ -66,9 +66,9 @@ ReadCopilot 不是另一个“读书统计工具”。
 
 ## 🎯 产品定位
 
-- **阅读教练**：核心是“改进”
-- **知识资产库**：核心是“沉淀”
-- **阅读仪表盘**：核心是“看见”
+- **阅读教练**：核心是"改进"
+- **知识资产库**：核心是"沉淀"
+- **阅读仪表盘**：核心是"看见"
 
 > ReadCopilot 的重点不是展示数据，而是帮助你把阅读变成更强的思考与写作能力。
 
@@ -109,6 +109,62 @@ ReadCopilot 采用本地优先与 BYOK 设计：
 
 ---
 
+## 📋 项目概览
+
+### 架构
+
+```
+ReadCopilot/
+├─ App/                 应用入口 (ReadCopilotApp.swift)
+├─ Data/                数据模型与存储 (LibraryStore, DiagnosisModel)
+├─ Networking/          API 客户端 (WeReadGateway, LLMClient)
+├─ Security/            Keychain 安全存储
+└─ UI/                  SwiftUI 视图 (RootView, SettingsView, Theme)
+```
+
+### 工作流程
+
+应用启动时加载 `ReadCopilotApp`，打开 `RootView`。用户在 `SettingsView` 中配置微信读书和 LLM API Key（安全存储在 Keychain）。`LibraryStore` 通过 `WeReadGateway` 同步用户的读书库，解析书籍和阅读统计数据。`DiagnosisModel` 将个别笔记发送给 `LLMClient` 进行分析。结果使用 SwiftData 本地存储。应用展示阅读仪表盘，支持选择特定书籍，触发 LLM 动力的笔记质量诊断。
+
+---
+
+## 🚀 快速开始
+
+### 环境要求
+
+- Xcode 14+
+- macOS 14+ (开发环境)
+- WeChat Reading API Key (以 `wrk-` 开头)
+- LLM API Key (OpenAI、Claude 等)
+
+### 构建与运行
+
+```bash
+# 安装 XcodeGen（如已安装可跳过）
+brew install xcodegen
+
+# 从 project.yml 生成 Xcode 项目
+xcodegen generate
+
+# 用 Xcode 打开项目
+open ReadCopilot.xcodeproj
+
+# 或使用命令行构建
+xcodebuild -scheme ReadCopilot -destination 'platform=macOS' build
+```
+
+### 首次使用
+
+1. 启动应用后，进入 **Settings** 页面
+2. 填入 WeChat Reading API Key（`wrk-` 开头）
+3. 填入你的 LLM API Key（OpenAI、Claude 等）
+4. 点击同步，应用会拉取你的读书库和笔记
+5. 选择要诊断的书籍和笔记，应用会给出改进建议
+
+> **注意**：所有 Key 仅存储在本地 Keychain，不会上传到任何服务器。
+
+---
+
 ## 🧭 路线图
 
 ### M1 — MVP
@@ -132,7 +188,7 @@ ReadCopilot 采用本地优先与 BYOK 设计：
 
 ---
 
-## 🧩 架构概览
+## 🧩 架构概览（详细版）
 
 ```text
 ReadCopilot
@@ -151,3 +207,4 @@ ReadCopilot
    ├─ Library
    ├─ BookDetail
    └─ Settings
+```
