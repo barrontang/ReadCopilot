@@ -143,6 +143,21 @@ final class LibraryStore: ObservableObject {
         self.books = result
     }
 
+    // MARK: 品类分布(用于仪表盘图表)
+    var categoryDistribution: [CategoryItem] {
+        var counts: [String: Int] = [:]
+        for book in books {
+            let cat = book.category.isEmpty ? "未分类" : book.category
+            counts[cat, default: 0] += 1
+        }
+        return counts
+            .filter { $0.value > 0 }
+            .map { CategoryItem(category: $0.key, count: $0.value) }
+            .sorted { $0.count > $1.count }
+            .prefix(8)
+            .map { $0 }
+    }
+
     // 秒 → "X小时Y分钟"
     static func fmtDuration(_ sec: Int) -> String {
         let h = sec / 3600, m = (sec % 3600) / 60

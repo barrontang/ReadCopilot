@@ -12,10 +12,13 @@
 		2D062DF9C5025390D80786A7 /* DiagnosisModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */; };
 		33F5D951E06D01720199238A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA818FC7F01D6457ACC4DC9 /* RootView.swift */; };
 		477A0D4BE0B65001CE37DFDF /* LLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81EB87D09B9A7304212F9D14 /* LLMClient.swift */; };
+		4CC7264DB57099F6D2F0D3A4 /* BookListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5FDBA7E9FFE101DA116C4A /* BookListView.swift */; };
 		6EDE20515481114347AA3BA2 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180C32923FA2016BE8D39DF1 /* Keychain.swift */; };
 		7B6535EEC853F898E17B6619 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E4896B1633BD4712B27FB1 /* Theme.swift */; };
 		7D263311D0A96BCC26EDB787 /* WeReadGateway.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6AF336A92DBD256AC1F59CA /* WeReadGateway.swift */; };
+		BD1197D657A50B305E92C4ED /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79060663E0B26FC7BE77317C /* DashboardView.swift */; };
 		C04B33713E3760832F220843 /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A2E8637FDAC87554648B41A /* LibraryStore.swift */; };
+		E0D2D99BC09583DE32E75C14 /* DiagnosisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03683B252108C9CC489BCA5 /* DiagnosisView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,12 +26,15 @@
 		354B24DBC2FF9F98B540EBF3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosisModel.swift; sourceTree = "<group>"; };
 		3BA818FC7F01D6457ACC4DC9 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		5B5FDBA7E9FFE101DA116C4A /* BookListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookListView.swift; sourceTree = "<group>"; };
 		6A2E8637FDAC87554648B41A /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStore.swift; sourceTree = "<group>"; };
+		79060663E0B26FC7BE77317C /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		81EB87D09B9A7304212F9D14 /* LLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMClient.swift; sourceTree = "<group>"; };
 		81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ReadCopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		909BBBF934E289E09753F075 /* ReadCopilotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadCopilotApp.swift; sourceTree = "<group>"; };
 		B0BEFC863405C3EF42F6D06C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C6AF336A92DBD256AC1F59CA /* WeReadGateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeReadGateway.swift; sourceTree = "<group>"; };
+		E03683B252108C9CC489BCA5 /* DiagnosisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosisView.swift; sourceTree = "<group>"; };
 		F9E4896B1633BD4712B27FB1 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -44,6 +50,9 @@
 		34106ABEE1565537F84DB2B1 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				5B5FDBA7E9FFE101DA116C4A /* BookListView.swift */,
+				79060663E0B26FC7BE77317C /* DashboardView.swift */,
+				E03683B252108C9CC489BCA5 /* DiagnosisView.swift */,
 				3BA818FC7F01D6457ACC4DC9 /* RootView.swift */,
 				B0BEFC863405C3EF42F6D06C /* SettingsView.swift */,
 				F9E4896B1633BD4712B27FB1 /* Theme.swift */,
@@ -165,7 +174,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CC7264DB57099F6D2F0D3A4 /* BookListView.swift in Sources */,
+				BD1197D657A50B305E92C4ED /* DashboardView.swift in Sources */,
 				2D062DF9C5025390D80786A7 /* DiagnosisModel.swift in Sources */,
+				E0D2D99BC09583DE32E75C14 /* DiagnosisView.swift in Sources */,
 				6EDE20515481114347AA3BA2 /* Keychain.swift in Sources */,
 				477A0D4BE0B65001CE37DFDF /* LLMClient.swift in Sources */,
 				C04B33713E3760832F220843 /* LibraryStore.swift in Sources */,
