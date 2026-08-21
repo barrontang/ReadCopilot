@@ -35,7 +35,7 @@ struct LLMClient {
     }
 
     /// 发一条 chat,返回文本内容。
-    func chat(system: String, user: String, maxTokens: Int = 512) async throws -> String {
+    func chat(system: String, user: String, maxTokens: Int = 512, timeout: TimeInterval = 120) async throws -> String {
         guard !apiKey.isEmpty, !baseURL.isEmpty else { throw LLMError.missingConfig }
         let url = try endpoint()
 
@@ -54,7 +54,7 @@ struct LLMClient {
         req.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.httpBody = try JSONSerialization.data(withJSONObject: payload)
-        req.timeoutInterval = 30
+        req.timeoutInterval = timeout   // 默认 120s，笔记诊断内容多，给足时间
 
         let (data, resp) = try await session.data(for: req)
         guard let http = resp as? HTTPURLResponse else { throw LLMError.http(-1, "无响应") }

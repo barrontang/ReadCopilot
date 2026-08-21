@@ -50,7 +50,8 @@ final class DiagnosisModel: ObservableObject {
             let result = try await client.chat(
                 system: systemPrompt,
                 user: prompt,
-                maxTokens: 1800
+                maxTokens: 1800,
+                timeout: 180   // 笔记诊断内容多，给 3 分钟
             )
             report = result
             state = .done
