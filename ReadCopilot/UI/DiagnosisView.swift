@@ -140,7 +140,7 @@ struct DiagnosisIdleView: View {
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
             Button {
-                Task { await model.run(book: book) }
+                model.run(book: book)   // 后台运行，完成时通知
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "sparkles")
@@ -213,7 +213,7 @@ struct DiagnosisErrorView: View {
         VStack(spacing: 12) {
             ErrorBanner(message: message)
             Button {
-                Task { await model.run(book: book) }
+                model.run(book: book)
             } label: {
                 Label("重试", systemImage: "arrow.clockwise")
                     .font(Theme.body(13))

@@ -30,7 +30,7 @@
 		6A2E8637FDAC87554648B41A /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStore.swift; sourceTree = "<group>"; };
 		79060663E0B26FC7BE77317C /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		81EB87D09B9A7304212F9D14 /* LLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMClient.swift; sourceTree = "<group>"; };
-		81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ReadCopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReadCopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		909BBBF934E289E09753F075 /* ReadCopilotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadCopilotApp.swift; sourceTree = "<group>"; };
 		B0BEFC863405C3EF42F6D06C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C6AF336A92DBD256AC1F59CA /* WeReadGateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeReadGateway.swift; sourceTree = "<group>"; };
@@ -197,8 +197,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ReadCopilot/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ReadCopilot;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -350,8 +353,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ReadCopilot/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ReadCopilot;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

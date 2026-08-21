@@ -1,6 +1,7 @@
 import Foundation
+import UserNotifications
 
-// MARK: - 诊断引擎:拉单本书笔记 → 组 prompt → 调 LLM → 流式输出诊断报告
+// MARK: - 诊断引擎:拉单本书笔记 → 组 prompt → 调 LLM → 后台运行，完成通知用户
 
 @MainActor
 final class DiagnosisModel: ObservableObject {
@@ -15,20 +16,33 @@ final class DiagnosisModel: ObservableObject {
         case failed(String)
     }
 
-    // MARK: 主入口
-    func run(book: LibraryBook) async {
+    // MARK: 主入口 — 后台运行，UI 不需要等待
+    func run(book: LibraryBook) {
         report = ""
         state = .fetchingNotes
 
         guard let wrKey = Keychain.get(.wereadAPIKey), wrKey.hasPrefix("wrk-") else {
-            state = .failed("未设置微信读书 Key,请到设置页填入 wrk- 开头的 Key"); return
+            state = .failed("未设置微信读书 Key，请到设置页填入 wrk- 开头的 Key")
+            return
         }
         guard let llmKey = Keychain.get(.llmAPIKey), !llmKey.isEmpty,
               let llmBase = Keychain.get(.llmBaseURL), !llmBase.isEmpty,
               let llmModel = Keychain.get(.llmModel), !llmModel.isEmpty else {
-            state = .failed("未设置 LLM Key,请到设置页填写并点击「测试连接并保存」"); return
+            state = .failed("未设置 LLM Key，请到设置页填写并点击「测试连接并保存」")
+            return
         }
 
+        // 在独立 Task 里跑，调用方无需 await — 用户可随时切走
+        Task {
+            await _diagnose(book: book, wrKey: wrKey, llmKey: llmKey, llmBase: llmBase, llmModel: llmModel)
+        }
+    }
+
+    // MARK: 实际异步执行（@MainActor 保证 Published 在主线程更新）
+    private func _diagnose(
+        book: LibraryBook,
+        wrKey: String, llmKey: String, llmBase: String, llmModel: String
+    ) async {
         do {
             // 并发拉划线 + 想法
             let gw = WeReadGateway(apiKey: wrKey)
@@ -37,10 +51,12 @@ final class DiagnosisModel: ObservableObject {
             let (bm, rv) = try await (bmJSON, rvJSON)
 
             let highlights = parseHighlights(bm)
-            let thoughts = parseThoughts(rv)
+            let thoughts   = parseThoughts(rv)
 
             guard !highlights.isEmpty || !thoughts.isEmpty else {
-                state = .failed("这本书暂无划线或想法记录,无法生成诊断。")
+                let msg = "这本书暂无划线或想法记录，无法生成诊断。"
+                state = .failed(msg)
+                await notify(title: "诊断失败 · \(book.title)", body: msg, isError: true)
                 return
             }
 
@@ -51,23 +67,66 @@ final class DiagnosisModel: ObservableObject {
                 system: systemPrompt,
                 user: prompt,
                 maxTokens: 1800,
-                timeout: 180   // 笔记诊断内容多，给 3 分钟
+                timeout: 180
             )
             report = result
-            state = .done
+            state  = .done
+
+            // ✅ 成功通知
+            await notify(
+                title: "诊断完成 · 《\(book.title)》",
+                body: extractOneLiner(from: result) ?? "笔记写作诊断报告已生成，点击查看。"
+            )
 
         } catch {
-            state = .failed(error.localizedDescription)
+            let msg = error.localizedDescription
+            state = .failed(msg)
+            await notify(title: "诊断失败 · \(book.title)", body: msg, isError: true)
         }
     }
 
-    // MARK: 解析划线(bookmarklist → updated[].markText)
+    // MARK: 发本地通知
+    private func notify(title: String, body: String, isError: Bool = false) async {
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+        guard settings.authorizationStatus == .authorized else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = title
+        content.body  = body
+        content.sound = isError ? .defaultCritical : .default
+
+        let req = UNNotificationRequest(
+            identifier: "diagnosis-\(UUID().uuidString)",
+            content: content,
+            trigger: nil   // 立即发送
+        )
+        try? await center.add(req)
+    }
+
+    // 从报告里提取「一句话总结」作为通知 body
+    private func extractOneLiner(from report: String) -> String? {
+        let lines = report.components(separatedBy: .newlines)
+        var capture = false
+        for line in lines {
+            if line.contains("一句话总结") { capture = true; continue }
+            if capture {
+                let t = line.trimmingCharacters(in: .whitespacesAndNewlines)
+                    .trimmingCharacters(in: CharacterSet(charactersIn: "#>*_"))
+                    .trimmingCharacters(in: .whitespaces)
+                if !t.isEmpty { return t }
+            }
+        }
+        return nil
+    }
+
+    // MARK: 解析划线
     private func parseHighlights(_ j: [String: Any]) -> [String] {
         let arr = j["updated"] as? [[String: Any]] ?? []
         return arr.compactMap { $0["markText"] as? String }.filter { !$0.isEmpty }
     }
 
-    // MARK: 解析想法(review/list/mine → reviews[].review.content + abstract)
+    // MARK: 解析想法
     private func parseThoughts(_ j: [String: Any]) -> [(abstract: String, content: String)] {
         let arr = j["reviews"] as? [[String: Any]] ?? []
         return arr.compactMap { item -> (String, String)? in
