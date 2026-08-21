@@ -127,7 +127,7 @@ struct BookHeader: View {
 // MARK: - 待开始状态
 struct DiagnosisIdleView: View {
     let book: LibraryBook
-    let model: DiagnosisModel
+    @ObservedObject var model: DiagnosisModel
 
     var body: some View {
         VStack(spacing: 16) {
@@ -176,38 +176,67 @@ struct DiagnosisProgressView: View {
     }
 }
 
-// MARK: - 诊断报告(Markdown 渲染)
+// MARK: - 诊断报告（逐块 Markdown 渲染，支持 ## 标题 + 正文）
 struct DiagnosisReportView: View {
     let report: String
 
+    /// 将报告按行切块：连续非标题行合并为段落，## 行单独成块
+    private var blocks: [Block] {
+        enum Kind { case heading, body }
+        struct Line { var kind: Kind; var text: String }
+
+        let lines = report.components(separatedBy: .newlines)
+        var result: [Block] = []
+        var pendingBody: [String] = []
+        func flush(_ buf: [String]) -> Block? {
+            let joined = buf.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+            return joined.isEmpty ? nil : Block(isHeading: false, text: joined)
+        }
+        for line in lines {
+            if line.hasPrefix("## ") || line.hasPrefix("### ") {
+                if let b = flush(pendingBody) { result.append(b) }
+                pendingBody = []
+                let heading = line.drop(while: { $0 == "#" || $0 == " " })
+                result.append(Block(isHeading: true, text: String(heading)))
+            } else {
+                pendingBody.append(line)
+            }
+        }
+        if let b = flush(pendingBody) { result.append(b) }
+        return result
+    }
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // 简单 Markdown 段落渲染(iOS 15+ TextRenderer / 使用 AttributedString)
-            Text(attributedReport)
-                .font(Theme.body(14))
-                .foregroundStyle(Theme.ink)
-                .lineSpacing(6)
-                .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(Array(blocks.enumerated()), id: \.offset) { _, block in
+                if block.isHeading {
+                    Text(block.text)
+                        .font(Theme.serifTitle(16))
+                        .foregroundStyle(Theme.ink)
+                        .padding(.top, 8)
+                } else {
+                    // 段落内保留 **粗体** 等行内 Markdown
+                    Text((try? AttributedString(markdown: block.text)) ?? AttributedString(block.text))
+                        .font(Theme.body(14))
+                        .foregroundStyle(Theme.ink)
+                        .lineSpacing(5)
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
         }
         .padding(20)
         .background(Theme.panel)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.hairline, lineWidth: 1))
     }
-
-    private var attributedReport: AttributedString {
-        // 尝试 Markdown 渲染，失败则回退纯文本
-        (try? AttributedString(markdown: report))
-            ?? AttributedString(report)
-    }
+    struct Block { var isHeading: Bool; var text: String }
 }
 
 // MARK: - 出错
 struct DiagnosisErrorView: View {
     let message: String
     let book: LibraryBook
-    let model: DiagnosisModel
+    @ObservedObject var model: DiagnosisModel
 
     var body: some View {
         VStack(spacing: 12) {
@@ -233,17 +262,7 @@ struct ExportPanel: View {
     @State private var saveError: String?
 
     private var markdownContent: String {
-        """
-        # 《\(book.title)》笔记诊断报告
-
-        **作者:** \(book.author)
-        **品类:** \(book.category)
-        **诊断时间:** \(Date().formatted(.dateTime.year().month().day()))
-
-        ---
-
-        \(report)
-        """
+        "# 《\(book.title)》笔记诊断报告\n\n**作者:** \(book.author)\n**品类:** \(book.category)\n**诊断时间:** \(Date().formatted(.dateTime.year().month().day()))\n\n---\n\n\(report)"
     }
 
     var body: some View {
@@ -298,10 +317,12 @@ struct ExportPanel: View {
     }
 
     private func sanitize(_ s: String) -> String {
-        s.unicodeScalars.filter { $0.value < 128 || CharacterSet.letters.contains($0) }
-            .map(String.init).joined()
-            .replacingOccurrences(of: " ", with: "_")
-            .prefix(30).description
+        // 保留中文、字母、数字，其余替换为下划线
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "\u{4E00}-\u{9FFF}"))
+        return s.map { c in
+            c.unicodeScalars.allSatisfy({ allowed.contains($0) }) ? String(c) : "_"
+        }.joined()
+        .prefix(30).description
     }
 }
 

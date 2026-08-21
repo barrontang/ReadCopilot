@@ -39,15 +39,12 @@ struct DashboardColumn: View {
                         .padding(.horizontal, 24)
                 }
 
-                if store.profile.totalReadTime == 0 && !store.loading {
+                if store.profile.totalReadTime == 0 && !store.loading && store.lastSyncedAt != nil {
                     EmptyDashboard()
                 } else {
                     // MARK: 核心数据卡片行
                     LazyVGrid(columns: [
-                        GridItem(.flexible(), spacing: 12),
-                        GridItem(.flexible(), spacing: 12),
-                        GridItem(.flexible(), spacing: 12),
-                        GridItem(.flexible(), spacing: 12),
+                        GridItem(.adaptive(minimum: 140), spacing: 12),
                     ], spacing: 12) {
                         StatCard(
                             icon: "clock.fill",
