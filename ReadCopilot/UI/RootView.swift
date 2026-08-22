@@ -1,27 +1,26 @@
 import SwiftUI
 
 enum Nav: String, CaseIterable, Identifiable {
-    case dashboard = "仪表盘"
-    case library   = "书库"
+    case home      = "阅读主页"
+    case copilot   = "Copilot"
+    case knowledge = "知识库"
     case settings  = "设置"
     var id: String { rawValue }
     var icon: String {
         switch self {
-        case .dashboard: return "chart.bar.doc.horizontal"
-        case .library:   return "books.vertical"
+        case .home:      return "books.vertical.fill"
+        case .copilot:   return "sparkles.rectangle.stack"
+        case .knowledge: return "point.3.connected.trianglepath.dotted"
         case .settings:  return "gearshape"
         }
     }
-    /// 是否需要中间书库列
-    var needsContentColumn: Bool { self == .library }
 }
 
 // MARK: - 根视图
 struct RootView: View {
     @StateObject private var store = LibraryStore()
-    @State private var nav: Nav = .dashboard
-    @State private var selectedBook: LibraryBook?
-    // .doubleColumn = 侧边栏 + detail，隐藏中间列（.detailOnly 会把侧边栏也藏掉）
+    @State private var nav: Nav = .home
+    @State private var selectedBookID = ""
     @State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
 
     var body: some View {
@@ -33,30 +32,22 @@ struct RootView: View {
             }
             .navigationTitle("ReadCopilot")
             .frame(minWidth: 180)
-        } content: {
-            // 中间列仅在书库导航下有意义
-            BookListColumn(store: store, selectedBook: $selectedBook)
-                .frame(minWidth: 260)
         } detail: {
             switch nav {
-            case .dashboard:
-                DashboardColumn(store: store)
+            case .home:
+                DashboardColumn(store: store) { book in
+                    selectedBookID = book.id
+                    nav = .copilot
+                }
+            case .copilot:
+                CopilotWorkspace(store: store, selectedBookID: $selectedBookID)
+            case .knowledge:
+                KnowledgeGraphView(books: store.books)
             case .settings:
                 SettingsView()
-            case .library:
-                if let book = selectedBook {
-                    DiagnosisColumn(book: book)
-                } else {
-                    ContentUnavailableView("选择一本书开始诊断", systemImage: "book.and.wrench")
-                }
             }
         }
         .background(Theme.bg)
         .tint(Theme.accent)
-        .onChange(of: nav) { _, newNav in
-            withAnimation {
-                columnVisibility = newNav.needsContentColumn ? .all : .doubleColumn
-            }
-        }
     }
 }

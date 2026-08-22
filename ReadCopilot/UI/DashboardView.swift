@@ -7,6 +7,7 @@ import Charts
 
 struct DashboardColumn: View {
     @ObservedObject var store: LibraryStore
+    let openBook: (LibraryBook) -> Void
 
     var body: some View {
         ScrollView {
@@ -14,10 +15,18 @@ struct DashboardColumn: View {
 
                 // MARK: 顶部标题行
                 HStack {
-                    Text("阅读仪表盘")
+                    Text("阅读主页")
                         .font(Theme.serifTitle(22))
                         .foregroundStyle(Theme.ink)
                     Spacer()
+                    Picker("统计周期", selection: Binding(
+                        get: { store.period },
+                        set: { newValue in Task { await store.syncAll(period: newValue) } }
+                    )) {
+                        ForEach(ReadingPeriod.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 260)
                     if store.loading {
                         ProgressView().controlSize(.small)
                     } else {
@@ -98,11 +107,8 @@ struct DashboardColumn: View {
                             .padding(.horizontal, 24)
                     }
 
-                    // MARK: 最近阅读
-                    if !store.books.isEmpty {
-                        RecentBooksRow(books: Array(store.books.prefix(6)))
-                            .padding(.horizontal, 24)
-                    }
+                    LibraryShelfSection(books: store.books, openBook: openBook)
+                        .padding(.horizontal, 24)
 
                     // MARK: 底部同步时间
                     if let ts = store.lastSyncedAt {
@@ -116,8 +122,63 @@ struct DashboardColumn: View {
             }
         }
         .background(Theme.bg)
-        .navigationTitle("仪表盘")
+        .navigationTitle("阅读主页")
         .task { if store.books.isEmpty && !store.loading { await store.syncAll() } }
+    }
+
+    struct LibraryShelfSection: View {
+        let books: [LibraryBook]
+        let openBook: (LibraryBook) -> Void
+        @State private var query = ""
+        @State private var filter: BookListColumn.FilterState = .all
+
+        private var filtered: [LibraryBook] {
+            books.filter { book in
+                let matchesQuery = query.isEmpty
+                    || book.title.localizedCaseInsensitiveContains(query)
+                    || book.author.localizedCaseInsensitiveContains(query)
+                let matchesFilter: Bool
+                switch filter {
+                case .all: matchesFilter = true
+                case .finished: matchesFilter = book.finished
+                case .unfinished: matchesFilter = !book.finished
+                }
+                return matchesQuery && matchesFilter
+            }
+        }
+
+        var body: some View {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text("我的书库")
+                        .font(Theme.serifTitle(18))
+                    Spacer()
+                    TextField("搜索书名或作者", text: $query)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(maxWidth: 240)
+                    Picker("状态", selection: $filter) {
+                        ForEach(BookListColumn.FilterState.allCases, id: \.self) {
+                            Text($0.rawValue).tag($0)
+                        }
+                    }
+                    .frame(width: 180)
+                }
+
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 12)], spacing: 12) {
+                    ForEach(filtered) { book in
+                        Button { openBook(book) } label: {
+                            BookRow(book: book)
+                                .padding(10)
+                                .frame(maxWidth: .infinity, minHeight: 80, alignment: .leading)
+                                .background(Theme.panel)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.hairline))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -449,6 +510,6 @@ struct ErrorBanner: View {
 }
 
 #Preview {
-    DashboardColumn(store: LibraryStore())
+    DashboardColumn(store: LibraryStore(), openBook: { _ in })
         .frame(width: 700, height: 800)
 }
