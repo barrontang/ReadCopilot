@@ -1,26 +1,113 @@
 import SwiftUI
 
+struct CopilotWorkspace: View {
+    @ObservedObject var store: LibraryStore
+    @Binding var selectedBookID: String
+    @State private var scope: AnalysisScope = .book
+    @State private var template: AnalysisTemplate = .coach
+    @State private var selectedCategory = ""
+
+    private var categories: [String] {
+        Array(Set(store.books.map(\.category).filter { !$0.isEmpty })).sorted()
+    }
+
+    private var selectedBooks: [LibraryBook] {
+        switch scope {
+        case .book:
+            return store.books.filter { $0.id == selectedBookID }
+        case .category:
+            return store.books.filter { $0.category == selectedCategory && !$0.isAlbum }
+        case .library:
+            return store.books.filter { !$0.isAlbum }
+        }
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Copilot 分析工作台")
+                    .font(Theme.serifTitle(22))
+                Picker("范围", selection: $scope) {
+                    ForEach(AnalysisScope.allCases) { Text($0.rawValue).tag($0) }
+                }
+                .pickerStyle(.segmented)
+
+                HStack {
+                    if scope == .book {
+                        Picker("图书", selection: $selectedBookID) {
+                            Text("选择一本书").tag("")
+                            ForEach(store.books.filter { !$0.isAlbum }) { Text($0.title).tag($0.id) }
+                        }
+                    } else if scope == .category {
+                        Picker("类别", selection: $selectedCategory) {
+                            Text("选择类别").tag("")
+                            ForEach(categories, id: \.self) { Text($0).tag($0) }
+                        }
+                    }
+                    Picker("模板", selection: $template) {
+                        ForEach(AnalysisTemplate.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                }
+                Text(template.description)
+                    .font(Theme.body(12))
+                    .foregroundStyle(Theme.inkSecondary)
+            }
+            .padding(24)
+
+            Divider()
+
+            if selectedBooks.isEmpty {
+                ContentUnavailableView(
+                    scope == .library ? "书库为空，请先同步" : "选择分析范围",
+                    systemImage: "sparkles.rectangle.stack"
+                )
+            } else {
+                DiagnosisColumn(books: selectedBooks, template: template)
+                    .id("\(scope.rawValue)-\(selectedBooks.map(\.id).joined())-\(template.rawValue)")
+            }
+        }
+        .background(Theme.bg)
+    }
+}
+
 // MARK: - 诊断详情列
 // 当用户在书库选中一本书后显示:书籍信息 + LLM 笔记写作诊断报告
 
 struct DiagnosisColumn: View {
-    let book: LibraryBook
+    let books: [LibraryBook]
+    let template: AnalysisTemplate
     @StateObject private var model = DiagnosisModel()
     @State private var showExportPanel = false
+    @State private var showConsent = false
+
+    private var primaryBook: LibraryBook? { books.first }
+    private var analysisTitle: String {
+        if let primaryBook, books.count == 1 {
+            return "《\(primaryBook.title)》"
+        }
+        return "\(books.count) 本书"
+    }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
 
                 // MARK: 书籍头部
-                BookHeader(book: book)
+                if let primaryBook, books.count == 1 {
+                    BookHeader(book: primaryBook)
+                } else {
+                    Label("\(books.count) 本书 · \(template.rawValue)", systemImage: "books.vertical")
+                        .font(Theme.serifTitle(18))
+                        .padding(.horizontal, 24)
+                        .padding(.top, 24)
+                }
 
                 Divider().padding(.horizontal, 24).padding(.vertical, 20)
 
                 // MARK: 诊断区域
                 VStack(alignment: .leading, spacing: 16) {
                     HStack {
-                        Label("笔记写作诊断", systemImage: "sparkles")
+                        Label(template.rawValue, systemImage: "sparkles")
                             .font(Theme.serifTitle(17))
                             .foregroundStyle(Theme.ink)
                         Spacer()
@@ -41,15 +128,24 @@ struct DiagnosisColumn: View {
 
                     switch model.state {
                     case .idle:
-                        DiagnosisIdleView(book: book, model: model)
+                        DiagnosisIdleView(
+                            title: analysisTitle,
+                            template: template,
+                            start: { showConsent = true }
+                        )
                     case .fetchingNotes:
-                        DiagnosisProgressView(message: "正在获取笔记与划线…")
+                        DiagnosisProgressView(
+                            message: "正在获取笔记与划线… \(model.completedBooks)/\(model.totalBooks)"
+                        )
                     case .generating:
                         DiagnosisProgressView(message: "AI 诊断中，请稍候…")
                     case .done:
                         DiagnosisReportView(report: model.report)
                     case .failed(let msg):
-                        DiagnosisErrorView(message: msg, book: book, model: model)
+                        DiagnosisErrorView(
+                            message: msg,
+                            retry: { showConsent = true }
+                        )
                     }
                 }
                 .padding(.horizontal, 24)
@@ -57,12 +153,18 @@ struct DiagnosisColumn: View {
             }
         }
         .background(Theme.bg)
-        .navigationTitle(book.title)
+        .navigationTitle(analysisTitle)
         .sheet(isPresented: $showExportPanel) {
-            ExportPanel(book: book, report: model.report)
+            ExportPanel(books: books, report: model.report, notes: model.notes)
         }
-        // 切书时重置
-        .id(book.id)
+        .alert("发送笔记进行分析？", isPresented: $showConsent) {
+            Button("取消", role: .cancel) {}
+            Button("同意并开始") {
+                model.run(books: books, template: template)
+            }
+        } message: {
+            Text("将把所选 \(books.count) 本书的划线与笔记发送到你配置的 LLM 服务商。私密内容请勿继续。")
+        }
     }
 }
 
@@ -126,21 +228,22 @@ struct BookHeader: View {
 
 // MARK: - 待开始状态
 struct DiagnosisIdleView: View {
-    let book: LibraryBook
-    @ObservedObject var model: DiagnosisModel
+    let title: String
+    let template: AnalysisTemplate
+    let start: () -> Void
 
     var body: some View {
         VStack(spacing: 16) {
             Image(systemName: "pencil.and.outline")
                 .font(.system(size: 40))
                 .foregroundStyle(Theme.hairline)
-            Text("AI 将分析你在《\(book.title)》中的划线与想法，\n诊断笔记思维模式，给出写作改进建议。")
+            Text("AI 将使用「\(template.rawValue)」模板分析\(title)中的划线与想法。")
                 .font(Theme.body(13))
                 .foregroundStyle(Theme.inkSecondary)
                 .multilineTextAlignment(.center)
                 .lineSpacing(4)
             Button {
-                model.run(book: book)   // 后台运行，完成时通知
+                start()
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: "sparkles")
@@ -235,14 +338,13 @@ struct DiagnosisReportView: View {
 // MARK: - 出错
 struct DiagnosisErrorView: View {
     let message: String
-    let book: LibraryBook
-    @ObservedObject var model: DiagnosisModel
+    let retry: () -> Void
 
     var body: some View {
         VStack(spacing: 12) {
             ErrorBanner(message: message)
             Button {
-                model.run(book: book)
+                retry()
             } label: {
                 Label("重试", systemImage: "arrow.clockwise")
                     .font(Theme.body(13))
@@ -256,13 +358,24 @@ struct DiagnosisErrorView: View {
 // MARK: - 导出面板 (Sheet)
 struct ExportPanel: View {
     @Environment(\.dismiss) var dismiss
-    let book: LibraryBook
+    let books: [LibraryBook]
     let report: String
-    @State private var saved = false
-    @State private var saveError: String?
+    let notes: [ReadingNote]
+    @State private var exportingMarkdown = false
+    @State private var exportingPDF = false
+    @State private var exportError: String?
 
     private var markdownContent: String {
-        "# 《\(book.title)》笔记诊断报告\n\n**作者:** \(book.author)\n**品类:** \(book.category)\n**诊断时间:** \(Date().formatted(.dateTime.year().month().day()))\n\n---\n\n\(report)"
+        ReportExporter.markdown(
+            title: books.count == 1 ? "《\(books.first?.title ?? "未命名")》阅读分析" : "跨书阅读分析",
+            author: books.count == 1 ? books.first?.author ?? "" : "",
+            report: report,
+            notes: notes
+        )
+    }
+
+    private var filename: String {
+        sanitize(books.count == 1 ? books.first?.title ?? "阅读分析" : "跨书阅读分析")
     }
 
     var body: some View {
@@ -271,30 +384,20 @@ struct ExportPanel: View {
                 .font(Theme.serifTitle(18))
                 .foregroundStyle(Theme.ink)
 
-            Text("《\(book.title)》")
+            Text(books.count == 1 ? "《\(books.first?.title ?? "未命名")》" : "\(books.count) 本书")
                 .font(Theme.body(14))
                 .foregroundStyle(Theme.inkSecondary)
 
-            if saved {
-                Label("已保存", systemImage: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                    .font(Theme.body(14))
-            } else if let err = saveError {
+            if let err = exportError {
                 ErrorBanner(message: err)
-            } else {
-                HStack(spacing: 12) {
-                    Button("保存 Markdown") {
-                        saveMarkdown()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Theme.accent)
-
-                    Button("关闭") { dismiss() }
-                        .buttonStyle(.bordered)
-                }
             }
 
-            if saved {
+            HStack(spacing: 12) {
+                Button("导出 Markdown") { exportingMarkdown = true }
+                    .buttonStyle(.borderedProminent)
+                    .tint(Theme.accent)
+                Button("导出 PDF") { exportingPDF = true }
+                    .buttonStyle(.bordered)
                 Button("关闭") { dismiss() }
                     .buttonStyle(.bordered)
             }
@@ -302,18 +405,18 @@ struct ExportPanel: View {
         .padding(32)
         .frame(minWidth: 360, minHeight: 200)
         .background(Theme.bg)
-    }
-
-    private func saveMarkdown() {
-        let desktop = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!
-        let filename = "ReadCopilot_\(sanitize(book.title))_\(DateFormatter.compact.string(from: Date())).md"
-        let url = desktop.appendingPathComponent(filename)
-        do {
-            try markdownContent.write(to: url, atomically: true, encoding: .utf8)
-            saved = true
-        } catch {
-            saveError = error.localizedDescription
-        }
+        .fileExporter(
+            isPresented: $exportingMarkdown,
+            document: ReportDocument(data: Data(markdownContent.utf8)),
+            contentType: .plainText,
+            defaultFilename: "\(filename)_\(DateFormatter.compact.string(from: Date())).md"
+        ) { result in handle(result) }
+        .fileExporter(
+            isPresented: $exportingPDF,
+            document: ReportDocument(data: ReportExporter.pdf(from: markdownContent)),
+            contentType: .pdf,
+            defaultFilename: "\(filename)_\(DateFormatter.compact.string(from: Date())).pdf"
+        ) { result in handle(result) }
     }
 
     private func sanitize(_ s: String) -> String {
@@ -323,6 +426,12 @@ struct ExportPanel: View {
             c.unicodeScalars.allSatisfy({ allowed.contains($0) }) ? String(c) : "_"
         }.joined()
         .prefix(30).description
+    }
+
+    private func handle(_ result: Result<URL, Error>) {
+        if case .failure(let error) = result {
+            exportError = error.localizedDescription
+        }
     }
 }
 

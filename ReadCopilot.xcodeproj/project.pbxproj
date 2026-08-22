@@ -19,6 +19,9 @@
 		BD1197D657A50B305E92C4ED /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79060663E0B26FC7BE77317C /* DashboardView.swift */; };
 		C04B33713E3760832F220843 /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A2E8637FDAC87554648B41A /* LibraryStore.swift */; };
 		E0D2D99BC09583DE32E75C14 /* DiagnosisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03683B252108C9CC489BCA5 /* DiagnosisView.swift */; };
+		A10000000000000000000001 /* AnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* AnalysisModels.swift */; };
+		A10000000000000000000002 /* ReportExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* ReportExporter.swift */; };
+		A10000000000000000000003 /* KnowledgeGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* KnowledgeGraphView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +39,9 @@
 		C6AF336A92DBD256AC1F59CA /* WeReadGateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeReadGateway.swift; sourceTree = "<group>"; };
 		E03683B252108C9CC489BCA5 /* DiagnosisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosisView.swift; sourceTree = "<group>"; };
 		F9E4896B1633BD4712B27FB1 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		A10000000000000000000011 /* AnalysisModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisModels.swift; sourceTree = "<group>"; };
+		A10000000000000000000012 /* ReportExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportExporter.swift; sourceTree = "<group>"; };
+		A10000000000000000000013 /* KnowledgeGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeGraphView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -56,6 +62,7 @@
 				3BA818FC7F01D6457ACC4DC9 /* RootView.swift */,
 				B0BEFC863405C3EF42F6D06C /* SettingsView.swift */,
 				F9E4896B1633BD4712B27FB1 /* Theme.swift */,
+				A10000000000000000000013 /* KnowledgeGraphView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -72,8 +79,10 @@
 		79BF2EE2840DF920367CF19F /* Data */ = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000011 /* AnalysisModels.swift */,
 				3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */,
 				6A2E8637FDAC87554648B41A /* LibraryStore.swift */,
+				A10000000000000000000012 /* ReportExporter.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -186,6 +195,9 @@
 				2CB085C8CA50EEB9E6ECB6C8 /* SettingsView.swift in Sources */,
 				7B6535EEC853F898E17B6619 /* Theme.swift in Sources */,
 				7D263311D0A96BCC26EDB787 /* WeReadGateway.swift in Sources */,
+				A10000000000000000000001 /* AnalysisModels.swift in Sources */,
+				A10000000000000000000002 /* ReportExporter.swift in Sources */,
+				A10000000000000000000003 /* KnowledgeGraphView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

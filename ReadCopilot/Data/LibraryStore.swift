@@ -31,6 +31,24 @@ struct ReadingProfile {
     var stats: [ReadStatItem] = []
 }
 
+enum ReadingPeriod: String, CaseIterable, Identifiable {
+    case weekly = "本周"
+    case monthly = "本月"
+    case annually = "本年"
+    case overall = "累计"
+
+    var id: String { rawValue }
+
+    var apiMode: String {
+        switch self {
+        case .weekly: return "weekly"
+        case .monthly: return "monthly"
+        case .annually: return "annually"
+        case .overall: return "overall"
+        }
+    }
+}
+
 // MARK: - LibraryStore:全量拉取书库 + 阅读画像
 
 @MainActor
@@ -40,6 +58,7 @@ final class LibraryStore: ObservableObject {
     @Published var loading = false
     @Published var error: String?
     @Published var lastSyncedAt: Date?
+    @Published var period: ReadingPeriod = .overall
 
     // 书架数量口径(文档规定):books + albums + (mp 非空 ? 1 : 0)
     @Published var bookCount = 0
@@ -53,19 +72,21 @@ final class LibraryStore: ObservableObject {
     }
 
     /// 全量同步:阅读统计(overall) + 全量书架。
-    func syncAll() async {
+    func syncAll(period: ReadingPeriod? = nil) async {
         guard let gw = gateway() else {
             error = "尚未配置微信读书 Key,请到设置页填入 wrk- 开头的 Key"
             return
         }
         loading = true; error = nil
+        let requestedPeriod = period ?? self.period
         defer { loading = false }
         do {
-            async let profileJSON = gw.readData(mode: "overall")
+            async let profileJSON = gw.readData(mode: requestedPeriod.apiMode)
             async let shelfJSON = gw.shelf()
             let (pj, sj) = try await (profileJSON, shelfJSON)
             parseProfile(pj)
             parseShelf(sj)
+            self.period = requestedPeriod
             lastSyncedAt = Date()
         } catch {
             self.error = error.localizedDescription
