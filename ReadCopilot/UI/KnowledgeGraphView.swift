@@ -88,7 +88,8 @@ private struct KnowledgeGraphCanvas: View {
                     .clipShape(Circle())
                     .position(center)
 
-                ForEach(Array(categories.enumerated()), id: \.element.name) { index, category in
+                ForEach(categories.indices, id: \.self) { index in
+                    let category = categories[index]
                     Button {
                         selection = category.name
                     } label: {

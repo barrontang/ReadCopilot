@@ -79,6 +79,12 @@ struct DashboardColumn: View {
                             label: "读完",
                             value: "\(store.books.filter { $0.finished }.count) 本"
                         )
+                        StatCard(
+                            icon: "percent",
+                            iconColor: Theme.accent,
+                            label: "完读率",
+                            value: completionRate
+                        )
                     }
                     .padding(.horizontal, 24)
 
@@ -118,6 +124,7 @@ struct DashboardColumn: View {
                             .padding(.horizontal, 24)
                             .padding(.bottom, 24)
                     }
+
                 }
             }
         }
@@ -126,7 +133,15 @@ struct DashboardColumn: View {
         .task { if store.books.isEmpty && !store.loading { await store.syncAll() } }
     }
 
-    struct LibraryShelfSection: View {
+    private var completionRate: String {
+        let readableBooks = store.books.filter { !$0.isAlbum }
+        guard !readableBooks.isEmpty else { return "—" }
+        let finished = readableBooks.filter(\.finished).count
+        return "\(Int((Double(finished) / Double(readableBooks.count) * 100).rounded()))%"
+    }
+}
+
+struct LibraryShelfSection: View {
         let books: [LibraryBook]
         let openBook: (LibraryBook) -> Void
         @State private var query = ""
@@ -144,7 +159,6 @@ struct DashboardColumn: View {
                 case .unfinished: matchesFilter = !book.finished
                 }
                 return matchesQuery && matchesFilter
-            }
         }
 
         var body: some View {

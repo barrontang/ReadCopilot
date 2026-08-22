@@ -56,8 +56,10 @@ enum ReportExporter {
         let attributed = NSAttributedString(
             string: text,
             attributes: [
-                .font: CTFontCreateWithName("PingFangSC-Regular" as CFString, 11, nil),
-                .foregroundColor: CGColor(gray: 0.12, alpha: 1)
+                NSAttributedString.Key(kCTFontAttributeName as String):
+                    CTFontCreateWithName("PingFangSC-Regular" as CFString, 11, nil),
+                NSAttributedString.Key(kCTForegroundColorAttributeName as String):
+                    CGColor(gray: 0.12, alpha: 1)
             ]
         )
         let framesetter = CTFramesetterCreateWithAttributedString(attributed)
