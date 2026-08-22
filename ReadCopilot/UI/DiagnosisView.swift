@@ -80,9 +80,12 @@ struct DiagnosisColumn: View {
     @State private var showExportPanel = false
     @State private var showConsent = false
 
-    private var primaryBook: LibraryBook { books[0] }
+    private var primaryBook: LibraryBook? { books.first }
     private var analysisTitle: String {
-        books.count == 1 ? "《\(primaryBook.title)》" : "\(books.count) 本书"
+        if let primaryBook, books.count == 1 {
+            return "《\(primaryBook.title)》"
+        }
+        return "\(books.count) 本书"
     }
 
     var body: some View {
@@ -90,7 +93,7 @@ struct DiagnosisColumn: View {
             VStack(alignment: .leading, spacing: 0) {
 
                 // MARK: 书籍头部
-                if books.count == 1 {
+                if let primaryBook, books.count == 1 {
                     BookHeader(book: primaryBook)
                 } else {
                     Label("\(books.count) 本书 · \(template.rawValue)", systemImage: "books.vertical")
@@ -364,15 +367,15 @@ struct ExportPanel: View {
 
     private var markdownContent: String {
         ReportExporter.markdown(
-            title: books.count == 1 ? "《\(books[0].title)》阅读分析" : "跨书阅读分析",
-            author: books.count == 1 ? books[0].author : "",
+            title: books.count == 1 ? "《\(books.first?.title ?? "未命名")》阅读分析" : "跨书阅读分析",
+            author: books.count == 1 ? books.first?.author ?? "" : "",
             report: report,
             notes: notes
         )
     }
 
     private var filename: String {
-        sanitize(books.count == 1 ? books[0].title : "跨书阅读分析")
+        sanitize(books.count == 1 ? books.first?.title ?? "阅读分析" : "跨书阅读分析")
     }
 
     var body: some View {
@@ -381,7 +384,7 @@ struct ExportPanel: View {
                 .font(Theme.serifTitle(18))
                 .foregroundStyle(Theme.ink)
 
-            Text(books.count == 1 ? "《\(books[0].title)》" : "\(books.count) 本书")
+            Text(books.count == 1 ? "《\(books.first?.title ?? "未命名")》" : "\(books.count) 本书")
                 .font(Theme.body(14))
                 .foregroundStyle(Theme.inkSecondary)
 

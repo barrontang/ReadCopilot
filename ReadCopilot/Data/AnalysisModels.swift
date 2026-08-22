@@ -65,7 +65,7 @@ enum AnalysisTemplate: String, CaseIterable, Identifiable {
 }
 
 struct ReadingNote: Identifiable, Hashable {
-    enum Kind: String {
+    enum Kind: String, Hashable {
         case highlight = "划线"
         case thought = "想法"
     }

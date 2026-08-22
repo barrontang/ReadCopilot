@@ -74,9 +74,9 @@ enum ReportExporter {
             let frame = CTFramesetterCreateFrame(framesetter, range, path, nil)
             CTFrameDraw(frame, context)
             let visible = CTFrameGetVisibleStringRange(frame)
+            context.endPDFPage()
             guard visible.length > 0 else { break }
             range.location += visible.length
-            context.endPDFPage()
         }
         context.closePDF()
         return data as Data
