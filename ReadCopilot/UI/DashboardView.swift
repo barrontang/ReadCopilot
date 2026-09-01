@@ -159,6 +159,7 @@ struct LibraryShelfSection: View {
                 case .unfinished: matchesFilter = !book.finished
                 }
                 return matchesQuery && matchesFilter
+            }
         }
 
         var body: some View {
@@ -194,7 +195,6 @@ struct LibraryShelfSection: View {
             }
         }
     }
-}
 
 // MARK: - 核心数字卡片
 struct StatCard: View {
