@@ -140,6 +140,34 @@ final class PersistentReadingProfile {
     
     /// Nested stats array
     var readStats: [ReadStatSnapshot] = []
+    
+    init(
+        id: String = "singleton",
+        totalReadTime: Int = 0,
+        readDays: Int = 0,
+        registTime: Int = 0,
+        preferCategoryWord: String = "",
+        preferTimeWord: String = "",
+        preferTime: [Int] = [],
+        bookCount: Int = 0,
+        albumCount: Int = 0,
+        hasMPCollection: Bool = false,
+        lastSyncedAt: Date? = nil,
+        readStats: [ReadStatSnapshot] = []
+    ) {
+        self.id = id
+        self.totalReadTime = totalReadTime
+        self.readDays = readDays
+        self.registTime = registTime
+        self.preferCategoryWord = preferCategoryWord
+        self.preferTimeWord = preferTimeWord
+        self.preferTime = preferTime
+        self.bookCount = bookCount
+        self.albumCount = albumCount
+        self.hasMPCollection = hasMPCollection
+        self.lastSyncedAt = lastSyncedAt
+        self.readStats = readStats
+    }
 }
 
 /// Snapshot of read statistics at a point in time

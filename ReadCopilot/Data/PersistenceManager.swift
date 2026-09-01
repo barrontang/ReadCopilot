@@ -44,10 +44,11 @@ struct PersistenceManager {
     /// Save or update a book in persistent storage
     func save(book: LibraryBook) throws {
         let context = ModelContext(Self.modelContainer)
+        let bookId = book.id
         
         // Check if already exists
         let fetchDescriptor = FetchDescriptor<PersistentBook>(
-            predicate: #Predicate { $0.id == book.id }
+            predicate: #Predicate { $0.id == bookId }
         )
         let existing = try context.fetch(fetchDescriptor).first
         
@@ -75,8 +76,9 @@ struct PersistenceManager {
         let context = ModelContext(Self.modelContainer)
         
         for book in books {
+            let bookId = book.id
             let fetchDescriptor = FetchDescriptor<PersistentBook>(
-                predicate: #Predicate { $0.id == book.id }
+                predicate: #Predicate { $0.id == bookId }
             )
             if let existing = try context.fetch(fetchDescriptor).first {
                 existing.title = book.title
@@ -202,9 +204,10 @@ struct PersistenceManager {
     /// Save or update reading profile
     func saveProfile(_ profile: ReadingProfile) throws {
         let context = ModelContext(Self.modelContainer)
+        let profileId = "singleton"
         
         let descriptor = FetchDescriptor<PersistentReadingProfile>(
-            predicate: #Predicate { $0.id == "singleton" }
+            predicate: #Predicate { $0.id == profileId }
         )
         let existing = try context.fetch(descriptor).first
         
