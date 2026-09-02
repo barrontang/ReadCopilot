@@ -8,23 +8,30 @@
 
 /* Begin PBXBuildFile section */
 		0A6BF239EBB4AA7AD14A52F1 /* ReadCopilotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909BBBF934E289E09753F075 /* ReadCopilotApp.swift */; };
+		0D0626583258F4AC4EAEE5A9 /* KeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EDEA9BCC417CCA3861694FA /* KeyStore.swift */; };
 		24CB6938D028893AFDEDD732 /* ReportExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BD42AED36F1442E592E4AB /* ReportExporter.swift */; };
 		2CB085C8CA50EEB9E6ECB6C8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BEFC863405C3EF42F6D06C /* SettingsView.swift */; };
 		2D062DF9C5025390D80786A7 /* DiagnosisModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */; };
 		33F5D951E06D01720199238A /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BA818FC7F01D6457ACC4DC9 /* RootView.swift */; };
 		3E8D419AA5D3106DF5E47D8B /* AnalysisModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E800D1961AEB91F0F0FF265F /* AnalysisModelsTests.swift */; };
+		3F7C8176329CF3DA827180EE /* AnalysisService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7CD322E52530D4C10921171 /* AnalysisService.swift */; };
 		477A0D4BE0B65001CE37DFDF /* LLMClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81EB87D09B9A7304212F9D14 /* LLMClient.swift */; };
+		482EB69B1BE2998AFCF778BE /* KnowledgeStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B822F105A85DD5C5F660FE3C /* KnowledgeStore.swift */; };
 		4CC7264DB57099F6D2F0D3A4 /* BookListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B5FDBA7E9FFE101DA116C4A /* BookListView.swift */; };
 		5044DAF4E93AEBC50877D58D /* KnowledgeGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4971C7B4A2D171168B45B114 /* KnowledgeGraphView.swift */; };
 		6D47C82E4091F741C95DE3E7 /* CoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE9F67F81135D243839D9BE /* CoreTests.swift */; };
 		6EDE20515481114347AA3BA2 /* Keychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180C32923FA2016BE8D39DF1 /* Keychain.swift */; };
 		7B6535EEC853F898E17B6619 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E4896B1633BD4712B27FB1 /* Theme.swift */; };
+		7C4A752EDA8E619D7EF49117 /* TopicExtractionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3704F06948B7CD3A77D16615 /* TopicExtractionService.swift */; };
 		7D263311D0A96BCC26EDB787 /* WeReadGateway.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6AF336A92DBD256AC1F59CA /* WeReadGateway.swift */; };
 		82664F32E617CA9804972383 /* AnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28971CA42E9F456B56BE8C50 /* AnalysisModels.swift */; };
 		8A18E3419EF5D5119BB195BE /* PersistenceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088323188EB83FE602B7980A /* PersistenceModels.swift */; };
 		983ACCB01F428E57CFAA43DA /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526BE2ACF9441A75820A2AAD /* PersistenceManager.swift */; };
+		AD733DBCB7B881D7B6293EBD /* KnowledgeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504113DECF269DCC627A54D5 /* KnowledgeStoreTests.swift */; };
 		BD1197D657A50B305E92C4ED /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79060663E0B26FC7BE77317C /* DashboardView.swift */; };
 		C04B33713E3760832F220843 /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A2E8637FDAC87554648B41A /* LibraryStore.swift */; };
+		C5C2B45A5F4E5D876C836D42 /* ServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2292695EE1D69544B1015E17 /* ServiceTests.swift */; };
+		D3BE5508AACD49CC59C8005D /* WeReadNotesService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD397B8AE9DF0C1A302C4EB6 /* WeReadNotesService.swift */; };
 		E0D2D99BC09583DE32E75C14 /* DiagnosisView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E03683B252108C9CC489BCA5 /* DiagnosisView.swift */; };
 /* End PBXBuildFile section */
 
@@ -41,11 +48,15 @@
 /* Begin PBXFileReference section */
 		088323188EB83FE602B7980A /* PersistenceModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceModels.swift; sourceTree = "<group>"; };
 		180C32923FA2016BE8D39DF1 /* Keychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keychain.swift; sourceTree = "<group>"; };
+		2292695EE1D69544B1015E17 /* ServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceTests.swift; sourceTree = "<group>"; };
 		28971CA42E9F456B56BE8C50 /* AnalysisModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisModels.swift; sourceTree = "<group>"; };
 		354B24DBC2FF9F98B540EBF3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3704F06948B7CD3A77D16615 /* TopicExtractionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopicExtractionService.swift; sourceTree = "<group>"; };
 		3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosisModel.swift; sourceTree = "<group>"; };
 		3BA818FC7F01D6457ACC4DC9 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		4971C7B4A2D171168B45B114 /* KnowledgeGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeGraphView.swift; sourceTree = "<group>"; };
+		4EDEA9BCC417CCA3861694FA /* KeyStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyStore.swift; sourceTree = "<group>"; };
+		504113DECF269DCC627A54D5 /* KnowledgeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeStoreTests.swift; sourceTree = "<group>"; };
 		526BE2ACF9441A75820A2AAD /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
 		5B5FDBA7E9FFE101DA116C4A /* BookListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookListView.swift; sourceTree = "<group>"; };
 		6A2E8637FDAC87554648B41A /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStore.swift; sourceTree = "<group>"; };
@@ -53,7 +64,10 @@
 		81EB87D09B9A7304212F9D14 /* LLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMClient.swift; sourceTree = "<group>"; };
 		81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ReadCopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		909BBBF934E289E09753F075 /* ReadCopilotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadCopilotApp.swift; sourceTree = "<group>"; };
+		A7CD322E52530D4C10921171 /* AnalysisService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisService.swift; sourceTree = "<group>"; };
+		AD397B8AE9DF0C1A302C4EB6 /* WeReadNotesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeReadNotesService.swift; sourceTree = "<group>"; };
 		B0BEFC863405C3EF42F6D06C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B822F105A85DD5C5F660FE3C /* KnowledgeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeStore.swift; sourceTree = "<group>"; };
 		C6AF336A92DBD256AC1F59CA /* WeReadGateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeReadGateway.swift; sourceTree = "<group>"; };
 		CFE9F67F81135D243839D9BE /* CoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTests.swift; sourceTree = "<group>"; };
 		DDC57286DD1CADAB37BB86A9 /* ReadCopilotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReadCopilotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,6 +105,8 @@
 			children = (
 				E800D1961AEB91F0F0FF265F /* AnalysisModelsTests.swift */,
 				CFE9F67F81135D243839D9BE /* CoreTests.swift */,
+				504113DECF269DCC627A54D5 /* KnowledgeStoreTests.swift */,
+				2292695EE1D69544B1015E17 /* ServiceTests.swift */,
 			);
 			path = ReadCopilotTests;
 			sourceTree = "<group>";
@@ -104,11 +120,23 @@
 			path = Networking;
 			sourceTree = "<group>";
 		};
+		673C1A9D7F427D1222E64CA1 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				A7CD322E52530D4C10921171 /* AnalysisService.swift */,
+				4EDEA9BCC417CCA3861694FA /* KeyStore.swift */,
+				3704F06948B7CD3A77D16615 /* TopicExtractionService.swift */,
+				AD397B8AE9DF0C1A302C4EB6 /* WeReadNotesService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
 		79BF2EE2840DF920367CF19F /* Data */ = {
 			isa = PBXGroup;
 			children = (
 				28971CA42E9F456B56BE8C50 /* AnalysisModels.swift */,
 				3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */,
+				B822F105A85DD5C5F660FE3C /* KnowledgeStore.swift */,
 				6A2E8637FDAC87554648B41A /* LibraryStore.swift */,
 				526BE2ACF9441A75820A2AAD /* PersistenceManager.swift */,
 				088323188EB83FE602B7980A /* PersistenceModels.swift */,
@@ -125,6 +153,7 @@
 				79BF2EE2840DF920367CF19F /* Data */,
 				44F0D7B2C0829BC8503A9A5F /* Networking */,
 				AA284D1856BDEFE23E56679E /* Security */,
+				673C1A9D7F427D1222E64CA1 /* Services */,
 				34106ABEE1565537F84DB2B1 /* UI */,
 			);
 			path = ReadCopilot;
@@ -204,11 +233,11 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					1F894A20D6E29033176D527D = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = 3R847WPTLS;
 						ProvisioningStyle = Automatic;
 					};
 					3F39448E4E3B50BB4D2374FE = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = 3R847WPTLS;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -239,12 +268,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				82664F32E617CA9804972383 /* AnalysisModels.swift in Sources */,
+				3F7C8176329CF3DA827180EE /* AnalysisService.swift in Sources */,
 				4CC7264DB57099F6D2F0D3A4 /* BookListView.swift in Sources */,
 				BD1197D657A50B305E92C4ED /* DashboardView.swift in Sources */,
 				2D062DF9C5025390D80786A7 /* DiagnosisModel.swift in Sources */,
 				E0D2D99BC09583DE32E75C14 /* DiagnosisView.swift in Sources */,
+				0D0626583258F4AC4EAEE5A9 /* KeyStore.swift in Sources */,
 				6EDE20515481114347AA3BA2 /* Keychain.swift in Sources */,
 				5044DAF4E93AEBC50877D58D /* KnowledgeGraphView.swift in Sources */,
+				482EB69B1BE2998AFCF778BE /* KnowledgeStore.swift in Sources */,
 				477A0D4BE0B65001CE37DFDF /* LLMClient.swift in Sources */,
 				C04B33713E3760832F220843 /* LibraryStore.swift in Sources */,
 				983ACCB01F428E57CFAA43DA /* PersistenceManager.swift in Sources */,
@@ -254,7 +286,9 @@
 				33F5D951E06D01720199238A /* RootView.swift in Sources */,
 				2CB085C8CA50EEB9E6ECB6C8 /* SettingsView.swift in Sources */,
 				7B6535EEC853F898E17B6619 /* Theme.swift in Sources */,
+				7C4A752EDA8E619D7EF49117 /* TopicExtractionService.swift in Sources */,
 				7D263311D0A96BCC26EDB787 /* WeReadGateway.swift in Sources */,
+				D3BE5508AACD49CC59C8005D /* WeReadNotesService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +298,8 @@
 			files = (
 				3E8D419AA5D3106DF5E47D8B /* AnalysisModelsTests.swift in Sources */,
 				6D47C82E4091F741C95DE3E7 /* CoreTests.swift in Sources */,
+				AD733DBCB7B881D7B6293EBD /* KnowledgeStoreTests.swift in Sources */,
+				C5C2B45A5F4E5D876C836D42 /* ServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,8 +348,9 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.readcopilot.ReadCopilotTests;
+				PRODUCT_MODULE_NAME = ReadCopilotTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReadCopilot.app/ReadCopilot";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReadCopilot.app/Contents/MacOS/ReadCopilot";
 			};
 			name = Release;
 		};
@@ -354,7 +391,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3R847WPTLS;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -422,7 +459,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3R847WPTLS;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -480,8 +517,9 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.readcopilot.ReadCopilotTests;
+				PRODUCT_MODULE_NAME = ReadCopilotTests;
 				SDKROOT = macosx;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReadCopilot.app/ReadCopilot";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ReadCopilot.app/Contents/MacOS/ReadCopilot";
 			};
 			name = Debug;
 		};

@@ -7,14 +7,17 @@ import SwiftData
 struct PersistenceManager {
     static let shared = PersistenceManager()
     
-    /// Create and configure the SwiftData model container
-    static var modelContainer: ModelContainer {
+    /// Create and configure the SwiftData model container (cached; a computed
+    /// property here would rebuild the container on every access and break
+    /// cross-context consistency)
+    static let modelContainer: ModelContainer = {
         let schema = Schema([
             PersistentBook.self,
             PersistentReadingNote.self,
             PersistentDiagnosisResult.self,
             PersistentReadingProfile.self,
-            ReadStatSnapshot.self
+            ReadStatSnapshot.self,
+            KnowledgeItem.self
         ])
         
         let modelConfiguration = ModelConfiguration(
@@ -32,7 +35,7 @@ struct PersistenceManager {
         } catch {
             fatalError("Could not initialize ModelContainer: \(error)")
         }
-    }
+    }()
     
     /// Create context for background operations
     private func backgroundContext() -> ModelContext {

@@ -23,6 +23,25 @@ struct ReportDocument: FileDocument {
 }
 
 enum ReportExporter {
+    static func notesMarkdown(title: String, author: String, notes: [ReadingNote]) -> String {
+        var sections = [
+            "# 《\(title)》划线与笔记",
+            author.isEmpty ? "" : "**作者：** \(author)",
+            "**导出时间：** \(Date().formatted(.iso8601.year().month().day()))",
+            "",
+            "共 \(notes.count) 条记录",
+            "",
+            "## 划线原文与对应笔记"
+        ]
+
+        for (index, note) in notes.enumerated() {
+            sections.append("\n### \(index + 1). \(note.kind.rawValue)")
+            sections.append("\n> \(note.sourceText.replacingOccurrences(of: "\n", with: "\n> "))")
+            sections.append(note.noteText.isEmpty ? "\n**我的笔记：** （无）" : "\n**我的笔记：** \(note.noteText)")
+        }
+        return sections.filter { !$0.isEmpty }.joined(separator: "\n")
+    }
+
     static func markdown(title: String, author: String, report: String, notes: [ReadingNote]) -> String {
         var sections = [
             "# \(title)",
@@ -53,11 +72,16 @@ enum ReportExporter {
             return Data()
         }
 
+        // PingFang 缺失时回退系统字体，保证中文可渲染
+        let preferred = CTFontCreateWithName("PingFangSC-Regular" as CFString, 11, nil)
+        let font = CTFontCopyPostScriptName(preferred) as String == "PingFangSC-Regular"
+            ? preferred
+            : CTFontCreateUIFontForLanguage(.system, 11, "zh-Hans" as CFString) ?? preferred
+
         let attributed = NSAttributedString(
             string: text,
             attributes: [
-                NSAttributedString.Key(kCTFontAttributeName as String):
-                    CTFontCreateWithName("PingFangSC-Regular" as CFString, 11, nil),
+                NSAttributedString.Key(kCTFontAttributeName as String): font,
                 NSAttributedString.Key(kCTForegroundColorAttributeName as String):
                     CGColor(gray: 0.12, alpha: 1)
             ]
@@ -68,8 +92,6 @@ enum ReportExporter {
         while range.location < attributed.length {
             context.beginPDFPage(nil)
             context.textMatrix = .identity
-            context.translateBy(x: 0, y: mediaBox.height)
-            context.scaleBy(x: 1, y: -1)
             let path = CGPath(rect: mediaBox.insetBy(dx: 48, dy: 48), transform: nil)
             let frame = CTFramesetterCreateFrame(framesetter, range, path, nil)
             CTFrameDraw(frame, context)

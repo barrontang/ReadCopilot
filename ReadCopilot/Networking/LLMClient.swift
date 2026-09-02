@@ -27,6 +27,13 @@ struct LLMClient {
     let model: String
     var session: URLSession = .shared
 
+    private var isOllama: Bool {
+        guard let url = URL(string: baseURL) else { return false }
+        return url.port == 11434
+            || url.host == "localhost"
+            || url.host == "127.0.0.1"
+    }
+
     private func endpoint() throws -> URL {
         var base = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
         if base.hasSuffix("/") { base.removeLast() }
@@ -36,10 +43,10 @@ struct LLMClient {
 
     /// 发一条 chat,返回文本内容。
     func chat(system: String, user: String, maxTokens: Int = 512, timeout: TimeInterval = 120) async throws -> String {
-        guard !apiKey.isEmpty, !baseURL.isEmpty else { throw LLMError.missingConfig }
+        guard !baseURL.isEmpty, !model.isEmpty else { throw LLMError.missingConfig }
         let url = try endpoint()
 
-        let payload: [String: Any] = [
+        var payload: [String: Any] = [
             "model": model,
             "messages": [
                 ["role": "system", "content": system],
@@ -48,6 +55,10 @@ struct LLMClient {
             "max_tokens": maxTokens,
             "stream": false
         ]
+        // Thinking models can consume a short validation budget before producing content.
+        if isOllama {
+            payload["think"] = false
+        }
 
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
@@ -77,6 +88,26 @@ struct LLMClient {
     /// 验证配置:发一条最小 ping,成功返回模型回话内容。
     func validate() async throws -> String {
         try await chat(system: "你是连接测试助手,只回复:连接成功",
-                       user: "ping", maxTokens: 16)
+                       user: "ping", maxTokens: 128)
+    }
+
+    func availableOllamaModels() async throws -> [String] {
+        var base = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        if base.hasSuffix("/") { base.removeLast() }
+        if base.hasSuffix("/v1") { base = String(base.dropLast(3)) }
+        guard let url = URL(string: base + "/api/tags") else { throw LLMError.badURL }
+
+        var request = URLRequest(url: url)
+        request.timeoutInterval = 10
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse else { throw LLMError.http(-1, "无响应") }
+        guard (200..<300).contains(http.statusCode) else {
+            throw LLMError.http(http.statusCode, String(data: data, encoding: .utf8) ?? "")
+        }
+        guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let models = json["models"] as? [[String: Any]] else {
+            throw LLMError.decoding("无法读取 Ollama 模型列表")
+        }
+        return models.compactMap { $0["name"] as? String }.sorted()
     }
 }

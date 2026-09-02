@@ -1,15 +1,16 @@
 import XCTest
 import Foundation
+@testable import ReadCopilot
 
 // MARK: - Mock URLSession for Testing
 
-class MockURLSession: URLSession {
+final class MockURLSession: NetworkSession {
     var mockData: Data?
     var mockResponse: URLResponse?
     var mockError: Error?
     var lastRequest: URLRequest?
     
-    override func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+    func data(for request: URLRequest) async throws -> (Data, URLResponse) {
         lastRequest = request
         
         if let error = mockError {
@@ -126,6 +127,7 @@ class WeReadGatewayTests: XCTestCase {
 
 // MARK: - Diagnosis Model Tests
 
+@MainActor
 class DiagnosisModelTests: XCTestCase {
     var diagnosisModel: DiagnosisModel!
     
@@ -170,7 +172,7 @@ class DiagnosisModelTests: XCTestCase {
             noteText: "我认为这对大型项目特别有益"
         )
         
-        let prompt = diagnosisModel.buildPrompt(books: [book1], notes: [note1, note2])
+        let prompt = AnalysisService.buildPrompt(books: [book1], notes: [note1, note2])
         
         XCTAssertTrue(prompt.contains("【分析范围】1 本书"))
         XCTAssertTrue(prompt.contains("Swift 教程"))
@@ -218,7 +220,7 @@ class DiagnosisModelTests: XCTestCase {
             ]
         ]
         
-        let notes = diagnosisModel.parseNotes(book: book, bookmarks: bookmarksJSON, reviews: reviewsJSON)
+        let notes = WeReadNotesService.parseNotes(book: book, bookmarks: bookmarksJSON, reviews: reviewsJSON)
         
         XCTAssertEqual(notes.count, 3)
         XCTAssertEqual(notes.filter { $0.kind == .highlight }.count, 2)
@@ -252,13 +254,14 @@ class DiagnosisModelTests: XCTestCase {
         继续努力
         """
         
-        let oneLiner = diagnosisModel.extractOneLiner(from: report)
+        let oneLiner = AnalysisService.extractOneLiner(from: report)
         XCTAssertEqual(oneLiner, "这是一个很好的总结。")
     }
 }
 
 // MARK: - LibraryStore Tests
 
+@MainActor
 class LibraryStoreTests: XCTestCase {
     func testCategoryDistribution() {
         let books = [

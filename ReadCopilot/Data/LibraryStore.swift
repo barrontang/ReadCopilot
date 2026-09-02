@@ -65,10 +65,45 @@ final class LibraryStore: ObservableObject {
     @Published var albumCount = 0
     @Published var hasMPCollection = false
     var totalShelfItems: Int { bookCount + albumCount + (hasMPCollection ? 1 : 0) }
+    var readableBooks: [LibraryBook] { books.filter { !$0.isAlbum } }
+    var finishedBooks: [LibraryBook] { readableBooks.filter(\.finished) }
+    var readingBooks: [LibraryBook] { readableBooks.filter { !$0.finished } }
+    var completionRate: Double {
+        guard !readableBooks.isEmpty else { return 0 }
+        return Double(finishedBooks.count) / Double(readableBooks.count)
+    }
+    var averageDailyReadTime: Int {
+        guard profile.readDays > 0 else { return 0 }
+        return profile.totalReadTime / profile.readDays
+    }
+    var readingStreak: Int {
+        guard profile.readDays > 0, profile.registTime > 0 else { return 0 }
+        let registeredDays = max(Calendar.current.dateComponents(
+            [.day],
+            from: Date(timeIntervalSince1970: TimeInterval(profile.registTime)),
+            to: Date()
+        ).day ?? 0, 1)
+        return min(profile.readDays, registeredDays)
+    }
+    var recentBooks: [LibraryBook] {
+        Array(books.sorted { $0.readUpdateTime > $1.readUpdateTime }.prefix(12))
+    }
 
     private func gateway() -> WeReadGateway? {
         guard let key = Keychain.get(.wereadAPIKey), key.hasPrefix("wrk-") else { return nil }
         return WeReadGateway(apiKey: key)
+    }
+
+    /// 启动即读本地缓存，离线也能看到上次同步的书架与画像。
+    init() {
+        if let cachedBooks = try? PersistenceManager.shared.fetchBooks(), !cachedBooks.isEmpty {
+            books = cachedBooks
+            bookCount = cachedBooks.count { !$0.isAlbum }
+            albumCount = cachedBooks.count { $0.isAlbum }
+        }
+        if let cachedProfile = try? PersistenceManager.shared.fetchProfile() {
+            profile = cachedProfile
+        }
     }
 
     /// 全量同步:阅读统计(overall) + 全量书架。
@@ -88,6 +123,12 @@ final class LibraryStore: ObservableObject {
             parseShelf(sj)
             self.period = requestedPeriod
             lastSyncedAt = Date()
+            do {
+                try PersistenceManager.shared.saveBooks(books)
+                try PersistenceManager.shared.saveProfile(profile)
+            } catch {
+                self.error = "已同步数据，但本地保存失败：\(error.localizedDescription)"
+            }
         } catch {
             self.error = error.localizedDescription
         }

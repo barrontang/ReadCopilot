@@ -9,6 +9,7 @@ enum KeychainKey: String {
     case llmAPIKey    = "com.readcopilot.llm.apikey"      // sk-... 等
     case llmBaseURL   = "com.readcopilot.llm.baseurl"     // 兼容自定义 endpoint
     case llmModel     = "com.readcopilot.llm.model"
+    case llmProvider  = "com.readcopilot.llm.provider"
 }
 
 struct Keychain {
@@ -47,6 +48,6 @@ struct Keychain {
     }
 
     static func deleteAll() {
-        [.wereadAPIKey, .llmAPIKey, .llmBaseURL, .llmModel].forEach { delete($0) }
+        [.wereadAPIKey, .llmAPIKey, .llmBaseURL, .llmModel, .llmProvider].forEach { delete($0) }
     }
 }

@@ -1,5 +1,11 @@
 import Foundation
 
+protocol NetworkSession {
+    func data(for request: URLRequest) async throws -> (Data, URLResponse)
+}
+
+extension URLSession: NetworkSession {}
+
 // MARK: - WeRead Gateway Client
 // 直接对接 https://i.weread.qq.com/api/agent/gateway
 // BYOK: key 由调用方从 Keychain 取出传入,本类不持久化 key。
@@ -27,10 +33,26 @@ struct WeReadGateway {
     static let skillVersion = "1.0.4"
 
     let apiKey: String                 // wrk-...
-    var session: URLSession = .shared
+    var session: any NetworkSession = URLSession.shared
 
     /// 通用调用:api_name + 平铺业务参数。返回原始 JSON 字典。
+    /// 对网络错误与 5xx 做一次指数退避重试。
     func call(_ apiName: String, params: [String: Any] = [:]) async throws -> [String: Any] {
+        do {
+            return try await callOnce(apiName, params: params)
+        } catch {
+            guard isRetryable(error) else { throw error }
+            try await Task.sleep(nanoseconds: 800_000_000)
+            return try await callOnce(apiName, params: params)
+        }
+    }
+
+    private func isRetryable(_ error: Error) -> Bool {
+        if case WeReadError.http(let code) = error { return code >= 500 || code == -1 }
+        return error is URLError
+    }
+
+    private func callOnce(_ apiName: String, params: [String: Any]) async throws -> [String: Any] {
         guard apiKey.hasPrefix("wrk-") else { throw WeReadError.missingKey }
 
         var body: [String: Any] = params

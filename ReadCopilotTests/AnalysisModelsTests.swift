@@ -1,4 +1,5 @@
 import XCTest
+import CoreGraphics
 @testable import ReadCopilot
 
 final class AnalysisModelsTests: XCTestCase {
@@ -36,5 +37,31 @@ final class AnalysisModelsTests: XCTestCase {
         XCTAssertTrue(result.contains("> 原文"))
         XCTAssertTrue(result.contains("**我的笔记：** 我的想法"))
         XCTAssertTrue(result.contains("## 结论"))
+    }
+
+    func testNotesExportIncludesHighlightWithoutThought() {
+        let note = ReadingNote(
+            id: "highlight-1",
+            bookID: "book-1",
+            bookTitle: "测试书",
+            kind: .highlight,
+            sourceText: "划线原文",
+            noteText: ""
+        )
+
+        let result = ReportExporter.notesMarkdown(title: "测试书", author: "作者", notes: [note])
+
+        XCTAssertTrue(result.contains("> 划线原文"))
+        XCTAssertTrue(result.contains("**我的笔记：** （无）"))
+        XCTAssertTrue(result.contains("共 1 条记录"))
+    }
+
+    func testPDFExportProducesReadablePage() {
+        let data = ReportExporter.pdf(from: "导出报告\n原文与笔记")
+        let provider = CGDataProvider(data: data as CFData)
+        let document = provider.flatMap(CGPDFDocument.init)
+
+        XCTAssertNotNil(document)
+        XCTAssertEqual(document?.numberOfPages, 1)
     }
 }

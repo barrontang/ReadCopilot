@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CopilotWorkspace: View {
     @ObservedObject var store: LibraryStore
+    @ObservedObject var knowledgeStore: KnowledgeStore
     @Binding var selectedBookID: String
     @State private var scope: AnalysisScope = .book
     @State private var template: AnalysisTemplate = .coach
@@ -62,7 +63,7 @@ struct CopilotWorkspace: View {
                     systemImage: "sparkles.rectangle.stack"
                 )
             } else {
-                DiagnosisColumn(books: selectedBooks, template: template)
+                DiagnosisColumn(books: selectedBooks, template: template, knowledgeStore: knowledgeStore)
                     .id("\(scope.rawValue)-\(selectedBooks.map(\.id).joined())-\(template.rawValue)")
             }
         }
@@ -76,9 +77,14 @@ struct CopilotWorkspace: View {
 struct DiagnosisColumn: View {
     let books: [LibraryBook]
     let template: AnalysisTemplate
+    @ObservedObject var knowledgeStore: KnowledgeStore
     @StateObject private var model = DiagnosisModel()
     @State private var showExportPanel = false
+    @State private var showNotesExportPanel = false
     @State private var showConsent = false
+    @State private var standaloneNotes: [ReadingNote] = []
+    @State private var loadingBookNotes = false
+    @State private var bookNotesMessage: String?
 
     private var primaryBook: LibraryBook? { books.first }
     private var analysisTitle: String {
@@ -111,6 +117,30 @@ struct DiagnosisColumn: View {
                             .font(Theme.serifTitle(17))
                             .foregroundStyle(Theme.ink)
                         Spacer()
+                        if let primaryBook, books.count == 1 {
+                            Menu {
+                                Button {
+                                    Task { await loadBookNotes(for: primaryBook, exportAfterLoading: true) }
+                                } label: {
+                                    Label("导出全部划线与笔记", systemImage: "square.and.arrow.up")
+                                }
+                                Button {
+                                    Task { await importBookNotes(for: primaryBook) }
+                                } label: {
+                                    Label("导入知识库", systemImage: "tray.and.arrow.down")
+                                }
+                            } label: {
+                                if loadingBookNotes {
+                                    ProgressView()
+                                        .controlSize(.small)
+                                } else {
+                                    Label("划线与笔记", systemImage: "highlighter")
+                                        .font(Theme.body(12))
+                                        .foregroundStyle(Theme.accent)
+                                }
+                            }
+                            .disabled(loadingBookNotes)
+                        }
                         switch model.state {
                         case .done:
                             Button {
@@ -124,6 +154,12 @@ struct DiagnosisColumn: View {
                         default:
                             EmptyView()
                         }
+                    }
+
+                    if let bookNotesMessage {
+                        Text(bookNotesMessage)
+                            .font(Theme.body(12))
+                            .foregroundStyle(Theme.inkSecondary)
                     }
 
                     switch model.state {
@@ -157,6 +193,11 @@ struct DiagnosisColumn: View {
         .sheet(isPresented: $showExportPanel) {
             ExportPanel(books: books, report: model.report, notes: model.notes)
         }
+        .sheet(isPresented: $showNotesExportPanel) {
+            if let primaryBook {
+                ExportPanel.NotesExportPanel(book: primaryBook, notes: standaloneNotes)
+            }
+        }
         .alert("发送笔记进行分析？", isPresented: $showConsent) {
             Button("取消", role: .cancel) {}
             Button("同意并开始") {
@@ -164,6 +205,34 @@ struct DiagnosisColumn: View {
             }
         } message: {
             Text("将把所选 \(books.count) 本书的划线与笔记发送到你配置的 LLM 服务商。私密内容请勿继续。")
+        }
+    }
+
+    private func loadBookNotes(for book: LibraryBook, exportAfterLoading: Bool) async {
+        loadingBookNotes = true
+        bookNotesMessage = nil
+        defer { loadingBookNotes = false }
+        do {
+            standaloneNotes = try await model.collectNotes(for: book)
+            bookNotesMessage = "已获取 \(standaloneNotes.count) 条划线与笔记"
+            if exportAfterLoading {
+                showNotesExportPanel = true
+            }
+        } catch {
+            bookNotesMessage = "获取失败：\(error.localizedDescription)"
+        }
+    }
+
+    private func importBookNotes(for book: LibraryBook) async {
+        loadingBookNotes = true
+        bookNotesMessage = nil
+        defer { loadingBookNotes = false }
+        do {
+            let notes = try await model.collectNotes(for: book)
+            let importedCount = knowledgeStore.importNotes(notes)
+            bookNotesMessage = importedCount == 0 ? "这 \(notes.count) 条记录已在知识库中" : "已导入知识库 \(importedCount) 条记录"
+        } catch {
+            bookNotesMessage = "导入失败：\(error.localizedDescription)"
         }
     }
 }
@@ -374,6 +443,58 @@ struct ExportPanel: View {
         )
     }
 
+    struct NotesExportPanel: View {
+        @Environment(\.dismiss) var dismiss
+        let book: LibraryBook
+        let notes: [ReadingNote]
+        @State private var exportingMarkdown = false
+        @State private var exportError: String?
+
+        private var content: String {
+            ReportExporter.notesMarkdown(title: book.title, author: book.author, notes: notes)
+        }
+
+        var body: some View {
+            VStack(spacing: 20) {
+                Text("导出划线与笔记")
+                    .font(Theme.serifTitle(18))
+                Text("《\(book.title)》共 \(notes.count) 条记录")
+                    .font(Theme.body(14))
+                    .foregroundStyle(Theme.inkSecondary)
+                if let exportError {
+                    ErrorBanner(message: exportError)
+                }
+                HStack(spacing: 12) {
+                    Button("导出 Markdown") { exportingMarkdown = true }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Theme.accent)
+                        .fileExporter(
+                            isPresented: $exportingMarkdown,
+                            document: ReportDocument(data: Data(content.utf8)),
+                            contentType: .plainText,
+                            defaultFilename: "\(sanitize(book.title))_划线与笔记_\(DateFormatter.compact.string(from: Date())).md"
+                        ) { result in
+                            if case .failure(let error) = result {
+                                exportError = error.localizedDescription
+                            }
+                        }
+                    Button("关闭") { dismiss() }
+                        .buttonStyle(.bordered)
+                }
+            }
+            .padding(32)
+            .frame(minWidth: 360, minHeight: 190)
+            .background(Theme.bg)
+        }
+
+        private func sanitize(_ text: String) -> String {
+            let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "\u{4E00}-\u{9FFF}"))
+            return text.map { scalar in
+                scalar.unicodeScalars.allSatisfy(allowed.contains) ? String(scalar) : "_"
+            }.joined().prefix(30).description
+        }
+    }
+
     private var filename: String {
         sanitize(books.count == 1 ? books.first?.title ?? "阅读分析" : "跨书阅读分析")
     }
@@ -396,8 +517,20 @@ struct ExportPanel: View {
                 Button("导出 Markdown") { exportingMarkdown = true }
                     .buttonStyle(.borderedProminent)
                     .tint(Theme.accent)
+                    .fileExporter(
+                        isPresented: $exportingMarkdown,
+                        document: ReportDocument(data: Data(markdownContent.utf8)),
+                        contentType: .plainText,
+                        defaultFilename: "\(filename)_\(DateFormatter.compact.string(from: Date())).md"
+                    ) { result in handle(result) }
                 Button("导出 PDF") { exportingPDF = true }
                     .buttonStyle(.bordered)
+                    .fileExporter(
+                        isPresented: $exportingPDF,
+                        document: ReportDocument(data: ReportExporter.pdf(from: markdownContent)),
+                        contentType: .pdf,
+                        defaultFilename: "\(filename)_\(DateFormatter.compact.string(from: Date())).pdf"
+                    ) { result in handle(result) }
                 Button("关闭") { dismiss() }
                     .buttonStyle(.bordered)
             }
@@ -405,18 +538,6 @@ struct ExportPanel: View {
         .padding(32)
         .frame(minWidth: 360, minHeight: 200)
         .background(Theme.bg)
-        .fileExporter(
-            isPresented: $exportingMarkdown,
-            document: ReportDocument(data: Data(markdownContent.utf8)),
-            contentType: .plainText,
-            defaultFilename: "\(filename)_\(DateFormatter.compact.string(from: Date())).md"
-        ) { result in handle(result) }
-        .fileExporter(
-            isPresented: $exportingPDF,
-            document: ReportDocument(data: ReportExporter.pdf(from: markdownContent)),
-            contentType: .pdf,
-            defaultFilename: "\(filename)_\(DateFormatter.compact.string(from: Date())).pdf"
-        ) { result in handle(result) }
     }
 
     private func sanitize(_ s: String) -> String {

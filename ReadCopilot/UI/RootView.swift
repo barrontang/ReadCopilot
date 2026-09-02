@@ -19,16 +19,21 @@ enum Nav: String, CaseIterable, Identifiable {
 // MARK: - 根视图
 struct RootView: View {
     @StateObject private var store = LibraryStore()
+    @StateObject private var knowledgeStore = KnowledgeStore()
     @State private var nav: Nav = .home
     @State private var selectedBookID = ""
     @State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            List(Nav.allCases, selection: $nav) { item in
-                Label(item.rawValue, systemImage: item.icon)
-                    .font(Theme.body(14))
-                    .tag(item)
+            List(Nav.allCases) { item in
+                Button {
+                    nav = item
+                } label: {
+                    Label(item.rawValue, systemImage: item.icon)
+                        .font(Theme.body(14))
+                }
+                .buttonStyle(.plain)
             }
             .navigationTitle("ReadCopilot")
             .frame(minWidth: 180)
@@ -40,9 +45,9 @@ struct RootView: View {
                     nav = .copilot
                 }
             case .copilot:
-                CopilotWorkspace(store: store, selectedBookID: $selectedBookID)
+                CopilotWorkspace(store: store, knowledgeStore: knowledgeStore, selectedBookID: $selectedBookID)
             case .knowledge:
-                KnowledgeGraphView(books: store.books)
+                KnowledgeGraphView(books: store.books, knowledgeStore: knowledgeStore)
             case .settings:
                 SettingsView()
             }

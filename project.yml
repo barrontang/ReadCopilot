@@ -12,12 +12,15 @@ settings:
     CURRENT_PROJECT_VERSION: "1"
     GENERATE_INFOPLIST_FILE: YES
     PRODUCT_NAME: ReadCopilot
-    DEVELOPMENT_TEAM: ""
+    DEVELOPMENT_TEAM: 3R847WPTLS
     CODE_SIGN_STYLE: Automatic
 targets:
   ReadCopilot:
     type: application
     supportedDestinations: [macOS, iOS]
+    scheme:
+      testTargets:
+        - ReadCopilotTests
     sources:
       - path: ReadCopilot
     info:
@@ -34,6 +37,10 @@ targets:
     type: bundle.unit-test
     platform: macOS
     deploymentTarget: "14.0"
+    settings:
+      base:
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/ReadCopilot.app/Contents/MacOS/ReadCopilot"
+        PRODUCT_MODULE_NAME: ReadCopilotTests
     sources:
       - path: ReadCopilotTests
     dependencies:

@@ -85,6 +85,18 @@ struct DashboardColumn: View {
                             label: "完读率",
                             value: completionRate
                         )
+                        StatCard(
+                            icon: "flame.fill",
+                            iconColor: .orange,
+                            label: "阅读历程",
+                            value: store.readingStreak > 0 ? "\(store.readingStreak) 天" : "—"
+                        )
+                        StatCard(
+                            icon: "chart.line.uptrend.xyaxis",
+                            iconColor: .purple,
+                            label: "日均阅读",
+                            value: store.averageDailyReadTime > 0 ? LibraryStore.fmtDuration(store.averageDailyReadTime) : "—"
+                        )
                     }
                     .padding(.horizontal, 24)
 
@@ -93,6 +105,9 @@ struct DashboardColumn: View {
                         ReadStatRow(stats: store.profile.stats)
                             .padding(.horizontal, 24)
                     }
+
+                    ReadingOverview(store: store)
+                        .padding(.horizontal, 24)
 
                     // MARK: 偏好信息
                     if !store.profile.preferCategoryWord.isEmpty || !store.profile.preferTimeWord.isEmpty {
@@ -110,6 +125,11 @@ struct DashboardColumn: View {
                     let categoryData = store.categoryDistribution
                     if !categoryData.isEmpty {
                         CategoryChart(data: categoryData)
+                            .padding(.horizontal, 24)
+                    }
+
+                    if !store.recentBooks.isEmpty {
+                        RecentBooksRow(books: store.recentBooks)
                             .padding(.horizontal, 24)
                     }
 
@@ -134,10 +154,49 @@ struct DashboardColumn: View {
     }
 
     private var completionRate: String {
-        let readableBooks = store.books.filter { !$0.isAlbum }
-        guard !readableBooks.isEmpty else { return "—" }
-        let finished = readableBooks.filter(\.finished).count
-        return "\(Int((Double(finished) / Double(readableBooks.count) * 100).rounded()))%"
+        guard !store.readableBooks.isEmpty else { return "—" }
+        return "\(Int((store.completionRate * 100).rounded()))%"
+    }
+}
+
+struct ReadingOverview: View {
+    @ObservedObject var store: LibraryStore
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("阅读概览")
+                .font(Theme.serifTitle(18))
+            HStack(spacing: 12) {
+                overviewItem("在读", value: "\(store.readingBooks.count) 本", icon: "book")
+                overviewItem("已读完", value: "\(store.finishedBooks.count) 本", icon: "checkmark.circle")
+                overviewItem("有声书", value: "\(store.albumCount) 本", icon: "headphones")
+                overviewItem("收藏文章", value: store.hasMPCollection ? "已同步" : "无", icon: "bookmark")
+            }
+            Divider()
+            HStack {
+                Text("统计周期：\(store.period.rawValue)")
+                Spacer()
+                Text(store.lastSyncedAt.map { "数据更新于 \($0.formatted(date: .abbreviated, time: .shortened))" } ?? "尚未同步")
+            }
+            .font(Theme.body(11))
+            .foregroundStyle(Theme.inkSecondary)
+        }
+        .padding(16)
+        .background(Theme.panel)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.hairline, lineWidth: 1))
+    }
+
+    private func overviewItem(_ title: String, value: String, icon: String) -> some View {
+        Label {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(value).font(Theme.body(14)).foregroundStyle(Theme.ink)
+                Text(title).font(Theme.body(11)).foregroundStyle(Theme.inkSecondary)
+            }
+        } icon: {
+            Image(systemName: icon).foregroundStyle(Theme.accent)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

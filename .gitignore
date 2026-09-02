@@ -30,3 +30,6 @@ Packages/
 
 # Hermes / secrets
 .env
+
+# Editors
+.vscode/
