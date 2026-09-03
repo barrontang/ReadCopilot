@@ -54,5 +54,6 @@ struct RootView: View {
         }
         .background(Theme.bg)
         .tint(Theme.accent)
+        .dynamicTypeSize(.xSmall ... .accessibility5)
     }
 }

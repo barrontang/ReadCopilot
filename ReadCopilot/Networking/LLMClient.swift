@@ -91,6 +91,7 @@ struct LLMClient {
                        user: "ping", maxTokens: 128)
     }
 
+    /// 读取本地 Ollama 已安装模型列表（按名称排序）。
     func availableOllamaModels() async throws -> [String] {
         var base = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
         if base.hasSuffix("/") { base.removeLast() }

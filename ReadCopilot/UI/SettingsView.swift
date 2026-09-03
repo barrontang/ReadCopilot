@@ -156,7 +156,7 @@ struct SettingsView: View {
                 .disabled(model.wereadKey.isEmpty || model.wrValidating)
                 if let msg = model.wrMessage {
                     Text(msg).font(.footnote)
-                        .foregroundStyle(model.wrOK ? .green : Theme.inkSecondary)
+                        .foregroundStyle(model.wrOK ? Theme.success : Theme.inkSecondary)
                 }
             } header: {
                 Text("微信读书 API Key(必填)").foregroundStyle(Theme.ink)
@@ -224,7 +224,7 @@ struct SettingsView: View {
 
                 if let msg = model.llmMessage {
                     Text(msg).font(.footnote)
-                        .foregroundStyle(model.llmOK ? .green : Theme.inkSecondary)
+                        .foregroundStyle(model.llmOK ? Theme.success : Theme.inkSecondary)
                 }
             } header: {
                 Text("阅读分析模型").foregroundStyle(Theme.ink)

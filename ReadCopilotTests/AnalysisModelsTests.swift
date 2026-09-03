@@ -64,4 +64,23 @@ final class AnalysisModelsTests: XCTestCase {
         XCTAssertNotNil(document)
         XCTAssertEqual(document?.numberOfPages, 1)
     }
+
+    func testExtractOneLinerReturnsFirstNonEmptyLine() {
+        let report = """
+        ## 一句话总结
+        **把输入拆成更小的可验证步骤。**
+
+        ## 细节
+        说明
+        """
+        XCTAssertEqual(
+            AnalysisService.extractOneLiner(from: report),
+            "把输入拆成更小的可验证步骤。"
+        )
+    }
+
+    func testDurationFormattingHandlesHoursAndMinutes() {
+        XCTAssertEqual(LibraryStore.fmtDuration(59 * 60), "59分钟")
+        XCTAssertEqual(LibraryStore.fmtDuration(2 * 3600 + 15 * 60), "2小时15分钟")
+    }
 }

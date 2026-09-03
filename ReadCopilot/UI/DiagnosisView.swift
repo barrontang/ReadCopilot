@@ -276,10 +276,10 @@ struct BookHeader: View {
                         TagChip(book.category)
                     }
                     if book.finished {
-                        TagChip("✓ 读完", color: .green)
+                        TagChip("✓ 读完", color: Theme.success)
                     }
                     if book.isAlbum {
-                        TagChip("有声书", color: .blue)
+                        TagChip("有声书", color: Theme.info)
                     }
                 }
                 if book.readUpdateTime > 0 {

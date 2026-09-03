@@ -69,13 +69,13 @@ struct DashboardColumn: View {
                         )
                         StatCard(
                             icon: "books.vertical.fill",
-                            iconColor: .blue,
+                            iconColor: Theme.info,
                             label: "书架总数",
                             value: "\(store.totalShelfItems) 本"
                         )
                         StatCard(
                             icon: "checkmark.seal.fill",
-                            iconColor: .green,
+                            iconColor: Theme.success,
                             label: "读完",
                             value: "\(store.books.filter { $0.finished }.count) 本"
                         )
@@ -535,7 +535,7 @@ struct BookThumbCard: View {
             if book.finished {
                 Label("读完", systemImage: "checkmark")
                     .font(.system(size: 9))
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Theme.success)
             }
         }
         .frame(width: 72)
