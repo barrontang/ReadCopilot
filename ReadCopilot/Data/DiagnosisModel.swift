@@ -33,10 +33,12 @@ final class DiagnosisModel: ObservableObject {
     }
 
     // MARK: 主入口 — 后台运行，UI 不需要等待
+    /// 启动单书分析流程，会立即切换到加载状态并在后台继续执行。
     func run(book: LibraryBook, template: AnalysisTemplate = .coach) {
         run(books: [book], template: template)
     }
 
+    /// 启动多书分析流程，按顺序抓取笔记后统一请求 LLM 生成报告。
     func run(books: [LibraryBook], template: AnalysisTemplate) {
         report = ""
         notes = []

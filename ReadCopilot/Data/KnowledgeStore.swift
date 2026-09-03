@@ -121,6 +121,7 @@ final class KnowledgeStore: ObservableObject {
     }
 
     @discardableResult
+    /// 批量导入笔记并按 ID 去重，返回实际新增条目数。
     func importNotes(_ notes: [ReadingNote]) -> Int {
         let context = ModelContext(container)
         let existingIDs = (try? context.fetch(FetchDescriptor<KnowledgeItem>()))
@@ -141,6 +142,7 @@ final class KnowledgeStore: ObservableObject {
         return newNotes.count
     }
 
+    /// 从 SwiftData 重新加载全部知识条目并按导入时间倒序更新内存状态。
     func reload() {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<KnowledgeItem>(
