@@ -60,9 +60,14 @@ final class PersistentReadingNote {
     @Attribute(.unique) var id: String
     var bookID: String
     var bookTitle: String
+    var bookCategory: String
     var kind: String  // "highlight" or "thought"
     var sourceText: String
     var noteText: String
+    var chapterTitle: String
+    var location: Int?
+    var recordedAt: Date?
+    var sequenceHint: Int
     var createdAt: Date
     
     /// Inverse relationship to PersistentBook
@@ -72,10 +77,15 @@ final class PersistentReadingNote {
         self.id = readingNote.id
         self.bookID = readingNote.bookID
         self.bookTitle = readingNote.bookTitle
+        self.bookCategory = readingNote.bookCategory
         self.kind = readingNote.kind.rawValue
         self.sourceText = readingNote.sourceText
         self.noteText = readingNote.noteText
-        self.createdAt = Date()
+        self.chapterTitle = readingNote.chapterTitle
+        self.location = readingNote.location
+        self.recordedAt = readingNote.recordedAt
+        self.sequenceHint = readingNote.sequenceHint
+        self.createdAt = readingNote.syncedAt
         self.book = book
     }
     
@@ -85,9 +95,15 @@ final class PersistentReadingNote {
             id: id,
             bookID: bookID,
             bookTitle: bookTitle,
+            bookCategory: bookCategory,
             kind: ReadingNote.Kind(rawValue: kind) ?? .highlight,
             sourceText: sourceText,
-            noteText: noteText
+            noteText: noteText,
+            chapterTitle: chapterTitle,
+            location: location,
+            recordedAt: recordedAt,
+            syncedAt: createdAt,
+            sequenceHint: sequenceHint
         )
     }
 }

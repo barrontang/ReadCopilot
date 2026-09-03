@@ -7,7 +7,11 @@
 
 - **Reading dashboard** - displays WeRead profile statistics, reading time,
   reading days, completion rate, daily average, shelf composition, category
-  distribution, reading-hour heatmap, and recent books.
+  distribution, reading-hour heatmap, recent books, and clickable drill-down
+  detail panels for the main summary cards.
+- **Notebook workspace** - caches synced highlights and thoughts locally, then
+  presents them in reading-order and calendar modes with book/category filters
+  and direct handoff to Copilot or the knowledge base.
 - **WeRead synchronization** - uses a user-provided `wrk-...` key to retrieve
   reading data and shelf contents. Successful synchronization is saved locally
   for offline viewing on later launches.
@@ -108,6 +112,7 @@ ReadCopilot/
 | Component | Responsibility |
 | --- | --- |
 | `LibraryStore` | Dashboard state, shelf/profile sync, local cache loading |
+| `NotebookStore` | Notebook cache loading, per-book note sync, filters, calendar state |
 | `WeReadGateway` | WeRead gateway request construction and retry |
 | `WeReadNotesService` | Full note retrieval and JSON-to-domain parsing |
 | `AnalysisService` | LLM configuration, prompt construction, analysis |

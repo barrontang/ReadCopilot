@@ -54,7 +54,9 @@ final class DiagnosisModel: ObservableObject {
 
     /// 单书全量笔记（供导出/导入知识库直接调用）
     func collectNotes(for book: LibraryBook) async throws -> [ReadingNote] {
-        try await notesService.fetchAllNotes(for: book)
+        let notes = try await notesService.fetchAllNotes(for: book)
+        try? PersistenceManager.shared.saveNotes(notes, bookID: book.id)
+        return notes
     }
 
     // MARK: 实际异步执行（@MainActor 保证 Published 在主线程更新）
@@ -66,7 +68,9 @@ final class DiagnosisModel: ObservableObject {
         do {
             var collected: [ReadingNote] = []
             for book in books {
-                collected.append(contentsOf: try await notesService.fetchAllNotes(for: book))
+                let bookNotes = try await notesService.fetchAllNotes(for: book)
+                try? PersistenceManager.shared.saveNotes(bookNotes, bookID: book.id)
+                collected.append(contentsOf: bookNotes)
                 completedBooks += 1
             }
             notes = collected

@@ -47,19 +47,25 @@ struct WeReadNotesService {
         bookmarks: [String: Any],
         reviews: [String: Any]
     ) -> [ReadingNote] {
-        let highlights = (bookmarks["updated"] as? [[String: Any]] ?? []).compactMap { item -> ReadingNote? in
+        let highlights = (bookmarks["updated"] as? [[String: Any]] ?? []).enumerated().compactMap { index, item -> ReadingNote? in
             guard let text = item["markText"] as? String, !text.isEmpty else { return nil }
             let rawID = item["bookmarkId"] as? String ?? UUID().uuidString
             return ReadingNote(
                 id: "\(book.id)-highlight-\(rawID)",
                 bookID: book.id,
                 bookTitle: book.title,
+                bookCategory: book.category,
                 kind: .highlight,
                 sourceText: text,
-                noteText: ""
+                noteText: "",
+                chapterTitle: stringValue(in: item, keys: ["chapterTitle", "chapterName", "chapterUid"]),
+                location: intValue(in: item, keys: ["range", "position", "start", "offset"]),
+                recordedAt: timestamp(in: item, keys: ["createTime", "updateTime", "markTime", "bookmarkTime"]),
+                syncedAt: Date(),
+                sequenceHint: index
             )
         }
-        let thoughts = (reviews["reviews"] as? [[String: Any]] ?? []).compactMap { item -> ReadingNote? in
+        let thoughts = (reviews["reviews"] as? [[String: Any]] ?? []).enumerated().compactMap { index, item -> ReadingNote? in
             guard let review = item["review"] as? [String: Any],
                   let content = review["content"] as? String,
                   !content.isEmpty else { return nil }
@@ -69,11 +75,67 @@ struct WeReadNotesService {
                 id: "\(book.id)-thought-\(rawID)",
                 bookID: book.id,
                 bookTitle: book.title,
+                bookCategory: book.category,
                 kind: .thought,
                 sourceText: source.isEmpty ? "（无对应原文）" : source,
-                noteText: content
+                noteText: content,
+                chapterTitle: stringValue(in: review, fallback: item, keys: ["chapterTitle", "chapterName", "chapterUid"]),
+                location: intValue(in: review, fallback: item, keys: ["range", "position", "start", "offset"]),
+                recordedAt: timestamp(in: review, fallback: item, keys: ["createTime", "updateTime", "reviewTime", "time"]),
+                syncedAt: Date(),
+                sequenceHint: index
             )
         }
         return highlights + thoughts
+    }
+
+    private static func stringValue(in primary: [String: Any], fallback: [String: Any]? = nil, keys: [String]) -> String {
+        for key in keys {
+            if let value = primary[key] as? String, !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return value
+            }
+            if let value = fallback?[key] as? String, !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return value
+            }
+        }
+        return ""
+    }
+
+    private static func intValue(in primary: [String: Any], fallback: [String: Any]? = nil, keys: [String]) -> Int? {
+        for key in keys {
+            if let value = integer(primary[key]) ?? integer(fallback?[key]) {
+                return value
+            }
+        }
+        return nil
+    }
+
+    private static func timestamp(in primary: [String: Any], fallback: [String: Any]? = nil, keys: [String]) -> Date? {
+        for key in keys {
+            if let value = integer(primary[key]) ?? integer(fallback?[key]), value > 0 {
+                return date(fromTimestamp: value)
+            }
+        }
+        return nil
+    }
+
+    private static func integer(_ value: Any?) -> Int? {
+        switch value {
+        case let int as Int:
+            return int
+        case let number as NSNumber:
+            return number.intValue
+        case let string as String:
+            return Int(string)
+        default:
+            return nil
+        }
+    }
+
+    private static func date(fromTimestamp timestamp: Int) -> Date {
+        if timestamp > 1_000_000_000_000 {
+            return Date(timeIntervalSince1970: TimeInterval(timestamp) / 1_000)
+        }
+        return Date(timeIntervalSince1970: TimeInterval(timestamp))
     }
 }

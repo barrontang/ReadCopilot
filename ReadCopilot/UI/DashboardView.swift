@@ -8,6 +8,7 @@ import Charts
 struct DashboardColumn: View {
     @ObservedObject var store: LibraryStore
     let openBook: (LibraryBook) -> Void
+    @State private var drilldown: DashboardDrilldown?
 
     var body: some View {
         ScrollView {
@@ -55,48 +56,13 @@ struct DashboardColumn: View {
                     LazyVGrid(columns: [
                         GridItem(.adaptive(minimum: 140), spacing: 12),
                     ], spacing: 12) {
-                        StatCard(
-                            icon: "clock.fill",
-                            iconColor: Theme.accent,
-                            label: "累计阅读",
-                            value: LibraryStore.fmtDuration(store.profile.totalReadTime)
-                        )
-                        StatCard(
-                            icon: "calendar",
-                            iconColor: .orange,
-                            label: "阅读天数",
-                            value: "\(store.profile.readDays) 天"
-                        )
-                        StatCard(
-                            icon: "books.vertical.fill",
-                            iconColor: Theme.info,
-                            label: "书架总数",
-                            value: "\(store.totalShelfItems) 本"
-                        )
-                        StatCard(
-                            icon: "checkmark.seal.fill",
-                            iconColor: Theme.success,
-                            label: "读完",
-                            value: "\(store.books.filter { $0.finished }.count) 本"
-                        )
-                        StatCard(
-                            icon: "percent",
-                            iconColor: Theme.accent,
-                            label: "完读率",
-                            value: completionRate
-                        )
-                        StatCard(
-                            icon: "flame.fill",
-                            iconColor: .orange,
-                            label: "阅读历程",
-                            value: store.readingStreak > 0 ? "\(store.readingStreak) 天" : "—"
-                        )
-                        StatCard(
-                            icon: "chart.line.uptrend.xyaxis",
-                            iconColor: .purple,
-                            label: "日均阅读",
-                            value: store.averageDailyReadTime > 0 ? LibraryStore.fmtDuration(store.averageDailyReadTime) : "—"
-                        )
+                        drilldownCard(.readingTime, icon: "clock.fill", color: Theme.accent, label: "累计阅读", value: LibraryStore.fmtDuration(store.profile.totalReadTime))
+                        drilldownCard(.readDays, icon: "calendar", color: .orange, label: "阅读天数", value: "\(store.profile.readDays) 天")
+                        drilldownCard(.shelf, icon: "books.vertical.fill", color: Theme.info, label: "书架总数", value: "\(store.totalShelfItems) 本")
+                        drilldownCard(.finished, icon: "checkmark.seal.fill", color: Theme.success, label: "读完", value: "\(store.books.filter { $0.finished }.count) 本")
+                        drilldownCard(.completionRate, icon: "percent", color: Theme.accent, label: "完读率", value: completionRate)
+                        drilldownCard(.streak, icon: "flame.fill", color: .orange, label: "阅读历程", value: store.readingStreak > 0 ? "\(store.readingStreak) 天" : "—")
+                        drilldownCard(.dailyAverage, icon: "chart.line.uptrend.xyaxis", color: .purple, label: "日均阅读", value: store.averageDailyReadTime > 0 ? LibraryStore.fmtDuration(store.averageDailyReadTime) : "—")
                     }
                     .padding(.horizontal, 24)
 
@@ -151,11 +117,28 @@ struct DashboardColumn: View {
         .background(Theme.bg)
         .navigationTitle("阅读主页")
         .task { if store.books.isEmpty && !store.loading { await store.syncAll() } }
+        .sheet(item: $drilldown) { item in
+            DashboardDrilldownSheet(item: item, store: store, openBook: openBook)
+        }
     }
 
     private var completionRate: String {
         guard !store.readableBooks.isEmpty else { return "—" }
         return "\(Int((store.completionRate * 100).rounded()))%"
+    }
+
+    private func drilldownCard(_ item: DashboardDrilldown, icon: String, color: Color, label: String, value: String) -> some View {
+        Button {
+            drilldown = item
+        } label: {
+            StatCard(
+                icon: icon,
+                iconColor: color,
+                label: label,
+                value: value
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -286,6 +269,169 @@ struct StatCard: View {
             RoundedRectangle(cornerRadius: 12)
                 .stroke(Theme.hairline, lineWidth: 1)
         )
+    }
+}
+
+enum DashboardDrilldown: String, Identifiable {
+    case readingTime
+    case readDays
+    case shelf
+    case finished
+    case completionRate
+    case streak
+    case dailyAverage
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .readingTime: return "阅读时长明细"
+        case .readDays: return "阅读天数明细"
+        case .shelf: return "书架与类别明细"
+        case .finished: return "完读明细"
+        case .completionRate: return "完读率明细"
+        case .streak: return "阅读历程明细"
+        case .dailyAverage: return "日均阅读明细"
+        }
+    }
+}
+
+struct DashboardDrilldownSheet: View {
+    let item: DashboardDrilldown
+    @ObservedObject var store: LibraryStore
+    let openBook: (LibraryBook) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    summaryBlock
+
+                    switch item {
+                    case .readingTime, .readDays, .streak, .dailyAverage:
+                        ReadingOverview(store: store)
+                        if !store.profile.preferTime.isEmpty {
+                            TimeHeatmap(buckets: store.profile.preferTime)
+                        }
+                    case .shelf:
+                        if !store.categoryDistribution.isEmpty {
+                            CategoryChart(data: store.categoryDistribution)
+                        }
+                        LibraryShelfSection(books: store.books, openBook: { book in
+                            dismiss()
+                            openBook(book)
+                        })
+                    case .finished, .completionRate:
+                        DrilldownBookList(title: "已读完", books: store.finishedBooks, openBook: { book in
+                            dismiss()
+                            openBook(book)
+                        })
+                        DrilldownBookList(title: "进行中", books: store.readingBooks, openBook: { book in
+                            dismiss()
+                            openBook(book)
+                        })
+                    }
+                }
+                .padding(24)
+            }
+            .background(Theme.bg)
+            .navigationTitle(item.title)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("完成") { dismiss() }
+                }
+            }
+        }
+        .frame(minWidth: 720, minHeight: 520)
+    }
+
+    private var summaryBlock: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(primaryValue)
+                .font(Theme.serifTitle(24))
+                .foregroundStyle(Theme.ink)
+            Text(secondaryValue)
+                .font(Theme.body(12))
+                .foregroundStyle(Theme.inkSecondary)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.panel)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.hairline, lineWidth: 1))
+    }
+
+    private var primaryValue: String {
+        switch item {
+        case .readingTime:
+            return LibraryStore.fmtDuration(store.profile.totalReadTime)
+        case .readDays:
+            return "\(store.profile.readDays) 天"
+        case .shelf:
+            return "\(store.totalShelfItems) 本"
+        case .finished:
+            return "\(store.finishedBooks.count) 本已读完"
+        case .completionRate:
+            return store.readableBooks.isEmpty ? "—" : "\(Int((store.completionRate * 100).rounded()))%"
+        case .streak:
+            return store.readingStreak > 0 ? "\(store.readingStreak) 天" : "—"
+        case .dailyAverage:
+            return store.averageDailyReadTime > 0 ? LibraryStore.fmtDuration(store.averageDailyReadTime) : "—"
+        }
+    }
+
+    private var secondaryValue: String {
+        switch item {
+        case .readingTime:
+            return "当前统计周期：\(store.period.rawValue) · 已阅读 \(store.profile.readDays) 天"
+        case .readDays:
+            return "最近一次同步后，阅读天数按 \(store.period.rawValue) 口径展示。"
+        case .shelf:
+            return "保留当前筛选与周期，继续下钻到书籍明细。"
+        case .finished:
+            return "点击书籍可直接进入 Copilot 工作台。"
+        case .completionRate:
+            return "完读率基于非有声书书籍计算。"
+        case .streak:
+            return "优先展示当前阅读历程，并保留最近同步上下文。"
+        case .dailyAverage:
+            return "基于累计阅读时长 ÷ 阅读天数得出。"
+        }
+    }
+}
+
+private struct DrilldownBookList: View {
+    let title: String
+    let books: [LibraryBook]
+    let openBook: (LibraryBook) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(Theme.serifTitle(18))
+            if books.isEmpty {
+                Text("暂无数据")
+                    .font(Theme.body(12))
+                    .foregroundStyle(Theme.inkSecondary)
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 220), spacing: 12)], spacing: 12) {
+                    ForEach(books) { book in
+                        Button {
+                            openBook(book)
+                        } label: {
+                            BookRow(book: book)
+                                .padding(10)
+                                .frame(maxWidth: .infinity, minHeight: 80, alignment: .leading)
+                                .background(Theme.panel)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.hairline))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
     }
 }
 

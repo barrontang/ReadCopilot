@@ -138,6 +138,12 @@ struct PersistenceManager {
         }
         
         // Clear existing notes for this book
+        let existingNotes = try context.fetch(FetchDescriptor<PersistentReadingNote>(
+            predicate: #Predicate { $0.bookID == bookID }
+        ))
+        for note in existingNotes {
+            context.delete(note)
+        }
         book.notes.removeAll()
         
         // Add new notes
@@ -155,10 +161,19 @@ struct PersistenceManager {
         let context = ModelContext(Self.modelContainer)
         let descriptor = FetchDescriptor<PersistentReadingNote>(
             predicate: #Predicate { $0.bookID == bookID },
-            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+            sortBy: [SortDescriptor(\.createdAt, order: .forward)]
         )
         let persistentNotes = try context.fetch(descriptor)
         return persistentNotes.map { $0.toReadingNote() }
+    }
+
+    /// Fetch all stored reading notes across books
+    func fetchAllNotes() throws -> [ReadingNote] {
+        let context = ModelContext(Self.modelContainer)
+        let descriptor = FetchDescriptor<PersistentReadingNote>(
+            sortBy: [SortDescriptor(\.createdAt, order: .forward)]
+        )
+        return try context.fetch(descriptor).map { $0.toReadingNote() }
     }
     
     // MARK: - Diagnosis Results Persistence

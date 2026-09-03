@@ -2,6 +2,7 @@ import SwiftUI
 
 enum Nav: String, CaseIterable, Identifiable {
     case home      = "阅读主页"
+    case notebook  = "Notebook"
     case copilot   = "Copilot"
     case knowledge = "知识库"
     case settings  = "设置"
@@ -9,6 +10,7 @@ enum Nav: String, CaseIterable, Identifiable {
     var icon: String {
         switch self {
         case .home:      return "books.vertical.fill"
+        case .notebook:  return "book.pages.fill"
         case .copilot:   return "sparkles.rectangle.stack"
         case .knowledge: return "point.3.connected.trianglepath.dotted"
         case .settings:  return "gearshape"
@@ -20,6 +22,7 @@ enum Nav: String, CaseIterable, Identifiable {
 struct RootView: View {
     @StateObject private var store = LibraryStore()
     @StateObject private var knowledgeStore = KnowledgeStore()
+    @StateObject private var notebookStore = NotebookStore()
     @State private var nav: Nav = .home
     @State private var selectedBookID = ""
     @State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
@@ -42,6 +45,16 @@ struct RootView: View {
             case .home:
                 DashboardColumn(store: store) { book in
                     selectedBookID = book.id
+                    nav = .copilot
+                }
+            case .notebook:
+                NotebookWorkspace(
+                    libraryStore: store,
+                    knowledgeStore: knowledgeStore,
+                    notebookStore: notebookStore,
+                    selectedBookID: $selectedBookID
+                ) { bookID in
+                    selectedBookID = bookID
                     nav = .copilot
                 }
             case .copilot:
