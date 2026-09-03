@@ -62,7 +62,9 @@ struct LLMClient {
 
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
-        req.setValue(apiKey, forHTTPHeaderField: "Authorization")
+        if !apiKey.isEmpty {
+            req.setValue(apiKey, forHTTPHeaderField: "Authorization")
+        }
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
         req.httpBody = try JSONSerialization.data(withJSONObject: payload)
         req.timeoutInterval = timeout   // 默认 120s，笔记诊断内容多，给足时间

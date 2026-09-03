@@ -260,6 +260,9 @@ struct StatCard: View {
                 .foregroundStyle(Theme.ink)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
+            Label("查看明细", systemImage: "chevron.right")
+                .font(Theme.body(10))
+                .foregroundStyle(Theme.inkSecondary)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)

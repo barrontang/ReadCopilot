@@ -111,7 +111,7 @@ struct NotebookWorkspace: View {
                 .frame(maxWidth: 220)
 
                 Picker("图书", selection: $notebookStore.selectedBookID) {
-                    Text("全部已缓存图书").tag("")
+                    Text("全部图书").tag("")
                     ForEach(availableBooks) { book in
                         Text(book.title).tag(book.id)
                     }
@@ -229,30 +229,29 @@ private struct NotebookCalendarView: View {
                 }
 
                 ForEach(cells) { cell in
-                    if let date = cell.date {
-                        Button {
-                            selectDay(date)
-                        } label: {
-                            VStack(spacing: 4) {
-                                Text(date.formatted(.dateTime.day()))
-                                    .font(Theme.body(12))
-                                    .foregroundStyle(cell.isCurrentMonth ? Theme.ink : Theme.inkSecondary)
-                                if let summary = cell.summary {
-                                    Text("\(summary.entryCount)")
-                                        .font(Theme.body(10))
-                                        .foregroundStyle(Theme.accent)
-                                } else {
-                                    Text(" ")
-                                        .font(Theme.body(10))
-                                }
+                    let date = cell.date
+                    Button {
+                        selectDay(date)
+                    } label: {
+                        VStack(spacing: 4) {
+                            Text(date.formatted(.dateTime.day()))
+                                .font(Theme.body(12))
+                                .foregroundStyle(cell.isCurrentMonth ? Theme.ink : Theme.inkSecondary)
+                            if let summary = cell.summary {
+                                Text("\(summary.entryCount)")
+                                    .font(Theme.body(10))
+                                    .foregroundStyle(Theme.accent)
+                            } else {
+                                Text(" ")
+                                    .font(Theme.body(10))
                             }
-                            .frame(maxWidth: .infinity, minHeight: 52)
-                            .background(background(for: cell, date: date))
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(border(for: cell, date: date), lineWidth: 1))
                         }
-                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity, minHeight: 52)
+                        .background(background(for: cell, date: date))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(border(for: cell, date: date), lineWidth: 1))
                     }
+                    .buttonStyle(.plain)
                 }
             }
             .padding(14)

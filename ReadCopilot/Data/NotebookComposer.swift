@@ -26,16 +26,11 @@ struct NotebookDaySummary: Identifiable, Hashable {
 }
 
 struct NotebookCalendarCell: Identifiable, Hashable {
-    let date: Date?
+    let date: Date
     let summary: NotebookDaySummary?
     let isCurrentMonth: Bool
 
-    var id: String {
-        if let date {
-            return "\(date.timeIntervalSince1970)-\(isCurrentMonth)"
-        }
-        return UUID().uuidString
-    }
+    var id: Date { date }
 }
 
 enum NotebookComposer {

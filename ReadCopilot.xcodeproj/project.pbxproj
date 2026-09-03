@@ -27,6 +27,10 @@
 		82664F32E617CA9804972383 /* AnalysisModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28971CA42E9F456B56BE8C50 /* AnalysisModels.swift */; };
 		8A18E3419EF5D5119BB195BE /* PersistenceModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 088323188EB83FE602B7980A /* PersistenceModels.swift */; };
 		983ACCB01F428E57CFAA43DA /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 526BE2ACF9441A75820A2AAD /* PersistenceManager.swift */; };
+		AA11AA11AA11AA11AA11AA12 /* NotebookComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11AA11AA11AA11AA11AA11 /* NotebookComposer.swift */; };
+		AA11AA11AA11AA11AA11AA22 /* NotebookStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11AA11AA11AA11AA11AA21 /* NotebookStore.swift */; };
+		AA11AA11AA11AA11AA11AA32 /* NotebookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11AA11AA11AA11AA11AA31 /* NotebookView.swift */; };
+		AA11AA11AA11AA11AA11AA42 /* NotebookComposerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11AA11AA11AA11AA11AA41 /* NotebookComposerTests.swift */; };
 		AD733DBCB7B881D7B6293EBD /* KnowledgeStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504113DECF269DCC627A54D5 /* KnowledgeStoreTests.swift */; };
 		BD1197D657A50B305E92C4ED /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79060663E0B26FC7BE77317C /* DashboardView.swift */; };
 		C04B33713E3760832F220843 /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A2E8637FDAC87554648B41A /* LibraryStore.swift */; };
@@ -64,6 +68,10 @@
 		81EB87D09B9A7304212F9D14 /* LLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMClient.swift; sourceTree = "<group>"; };
 		81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ReadCopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		909BBBF934E289E09753F075 /* ReadCopilotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadCopilotApp.swift; sourceTree = "<group>"; };
+		AA11AA11AA11AA11AA11AA11 /* NotebookComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookComposer.swift; sourceTree = "<group>"; };
+		AA11AA11AA11AA11AA11AA21 /* NotebookStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookStore.swift; sourceTree = "<group>"; };
+		AA11AA11AA11AA11AA11AA31 /* NotebookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookView.swift; sourceTree = "<group>"; };
+		AA11AA11AA11AA11AA11AA41 /* NotebookComposerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookComposerTests.swift; sourceTree = "<group>"; };
 		A7CD322E52530D4C10921171 /* AnalysisService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisService.swift; sourceTree = "<group>"; };
 		AD397B8AE9DF0C1A302C4EB6 /* WeReadNotesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeReadNotesService.swift; sourceTree = "<group>"; };
 		B0BEFC863405C3EF42F6D06C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -93,6 +101,7 @@
 				79060663E0B26FC7BE77317C /* DashboardView.swift */,
 				E03683B252108C9CC489BCA5 /* DiagnosisView.swift */,
 				4971C7B4A2D171168B45B114 /* KnowledgeGraphView.swift */,
+				AA11AA11AA11AA11AA11AA31 /* NotebookView.swift */,
 				3BA818FC7F01D6457ACC4DC9 /* RootView.swift */,
 				B0BEFC863405C3EF42F6D06C /* SettingsView.swift */,
 				F9E4896B1633BD4712B27FB1 /* Theme.swift */,
@@ -106,6 +115,7 @@
 				E800D1961AEB91F0F0FF265F /* AnalysisModelsTests.swift */,
 				CFE9F67F81135D243839D9BE /* CoreTests.swift */,
 				504113DECF269DCC627A54D5 /* KnowledgeStoreTests.swift */,
+				AA11AA11AA11AA11AA11AA41 /* NotebookComposerTests.swift */,
 				2292695EE1D69544B1015E17 /* ServiceTests.swift */,
 			);
 			path = ReadCopilotTests;
@@ -138,6 +148,8 @@
 				3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */,
 				B822F105A85DD5C5F660FE3C /* KnowledgeStore.swift */,
 				6A2E8637FDAC87554648B41A /* LibraryStore.swift */,
+				AA11AA11AA11AA11AA11AA11 /* NotebookComposer.swift */,
+				AA11AA11AA11AA11AA11AA21 /* NotebookStore.swift */,
 				526BE2ACF9441A75820A2AAD /* PersistenceManager.swift */,
 				088323188EB83FE602B7980A /* PersistenceModels.swift */,
 				E7BD42AED36F1442E592E4AB /* ReportExporter.swift */,
@@ -279,6 +291,9 @@
 				482EB69B1BE2998AFCF778BE /* KnowledgeStore.swift in Sources */,
 				477A0D4BE0B65001CE37DFDF /* LLMClient.swift in Sources */,
 				C04B33713E3760832F220843 /* LibraryStore.swift in Sources */,
+				AA11AA11AA11AA11AA11AA12 /* NotebookComposer.swift in Sources */,
+				AA11AA11AA11AA11AA11AA22 /* NotebookStore.swift in Sources */,
+				AA11AA11AA11AA11AA11AA32 /* NotebookView.swift in Sources */,
 				983ACCB01F428E57CFAA43DA /* PersistenceManager.swift in Sources */,
 				8A18E3419EF5D5119BB195BE /* PersistenceModels.swift in Sources */,
 				0A6BF239EBB4AA7AD14A52F1 /* ReadCopilotApp.swift in Sources */,
@@ -299,6 +314,7 @@
 				3E8D419AA5D3106DF5E47D8B /* AnalysisModelsTests.swift in Sources */,
 				6D47C82E4091F741C95DE3E7 /* CoreTests.swift in Sources */,
 				AD733DBCB7B881D7B6293EBD /* KnowledgeStoreTests.swift in Sources */,
+				AA11AA11AA11AA11AA11AA42 /* NotebookComposerTests.swift in Sources */,
 				C5C2B45A5F4E5D876C836D42 /* ServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
