@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="/README.md">English</a>
+  <a href="./README.md">English</a>
 </p>
 
 ReadCopilot 面向重度阅读用户：
@@ -113,7 +113,7 @@ open ReadCopilot.xcodeproj
    ollama pull qwen2.5
    ```
 
-5. 回到 **Settings**，扫描本地模型并测试保存。
+5. 回到 **Settings**，扫描本地模型、选择一个模型，再测试保存。
 6. 打开 **阅读主页（Reading Home）**，点击 **Sync**。
 7. 打开 **Copilot**，对图书做分析、导出划线，或把笔记导入知识库。
 8. 打开 **知识库（Knowledge Base）**，执行 **AI Extract Topics**，生成可筛选的主题标签。

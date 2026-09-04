@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="/README.zh-CN.md">简体中文</a>
+  <a href="./README.zh-CN.md">简体中文</a>
 </p>
 
 ReadCopilot helps serious readers move from scattered highlights to reusable knowledge.
@@ -114,7 +114,7 @@ open ReadCopilot.xcodeproj
    ollama pull qwen2.5
    ```
 
-5. Return to **Settings**, scan local installed models, then test and save the connection.
+5. Return to **Settings**, scan local installed models, select a model, then test and save the connection.
 6. Open **Reading Home** and select **Sync**.
 7. Open **Copilot** to analyze a book, export highlights, or import notes into the knowledge base.
 8. Open **Knowledge Base** and run **AI Extract Topics** to organize imported items into topic labels.
