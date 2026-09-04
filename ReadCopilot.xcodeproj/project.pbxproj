@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0A6BF239EBB4AA7AD14A52F1 /* ReadCopilotApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909BBBF934E289E09753F075 /* ReadCopilotApp.swift */; };
 		0D0626583258F4AC4EAEE5A9 /* KeyStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EDEA9BCC417CCA3861694FA /* KeyStore.swift */; };
+		2182BFBCB966E23CA542BB57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 661882D57C7B10ECCC4C58C9 /* Assets.xcassets */; };
 		24CB6938D028893AFDEDD732 /* ReportExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7BD42AED36F1442E592E4AB /* ReportExporter.swift */; };
 		2CB085C8CA50EEB9E6ECB6C8 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0BEFC863405C3EF42F6D06C /* SettingsView.swift */; };
 		2D062DF9C5025390D80786A7 /* DiagnosisModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B44E23DBE31FEF52D16284A /* DiagnosisModel.swift */; };
@@ -59,10 +60,11 @@
 		504113DECF269DCC627A54D5 /* KnowledgeStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeStoreTests.swift; sourceTree = "<group>"; };
 		526BE2ACF9441A75820A2AAD /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
 		5B5FDBA7E9FFE101DA116C4A /* BookListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookListView.swift; sourceTree = "<group>"; };
+		661882D57C7B10ECCC4C58C9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6A2E8637FDAC87554648B41A /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryStore.swift; sourceTree = "<group>"; };
 		79060663E0B26FC7BE77317C /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		81EB87D09B9A7304212F9D14 /* LLMClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMClient.swift; sourceTree = "<group>"; };
-		81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ReadCopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReadCopilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		909BBBF934E289E09753F075 /* ReadCopilotApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadCopilotApp.swift; sourceTree = "<group>"; };
 		A7CD322E52530D4C10921171 /* AnalysisService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisService.swift; sourceTree = "<group>"; };
 		AD397B8AE9DF0C1A302C4EB6 /* WeReadNotesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeReadNotesService.swift; sourceTree = "<group>"; };
@@ -70,7 +72,7 @@
 		B822F105A85DD5C5F660FE3C /* KnowledgeStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeStore.swift; sourceTree = "<group>"; };
 		C6AF336A92DBD256AC1F59CA /* WeReadGateway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeReadGateway.swift; sourceTree = "<group>"; };
 		CFE9F67F81135D243839D9BE /* CoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreTests.swift; sourceTree = "<group>"; };
-		DDC57286DD1CADAB37BB86A9 /* ReadCopilotTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReadCopilotTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		DDC57286DD1CADAB37BB86A9 /* ReadCopilot.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ReadCopilot.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E03683B252108C9CC489BCA5 /* DiagnosisView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosisView.swift; sourceTree = "<group>"; };
 		E7BD42AED36F1442E592E4AB /* ReportExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportExporter.swift; sourceTree = "<group>"; };
 		E800D1961AEB91F0F0FF265F /* AnalysisModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisModelsTests.swift; sourceTree = "<group>"; };
@@ -148,6 +150,7 @@
 		875D6D867598B23A35D6D71B /* ReadCopilot */ = {
 			isa = PBXGroup;
 			children = (
+				661882D57C7B10ECCC4C58C9 /* Assets.xcassets */,
 				354B24DBC2FF9F98B540EBF3 /* Info.plist */,
 				1326E2F2941E588E2BA58B48 /* App */,
 				79BF2EE2840DF920367CF19F /* Data */,
@@ -163,7 +166,7 @@
 			isa = PBXGroup;
 			children = (
 				81FD1E7DEA5B219B0CB00C38 /* ReadCopilot.app */,
-				DDC57286DD1CADAB37BB86A9 /* ReadCopilotTests.xctest */,
+				DDC57286DD1CADAB37BB86A9 /* ReadCopilot.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -203,7 +206,7 @@
 			packageProductDependencies = (
 			);
 			productName = ReadCopilotTests;
-			productReference = DDC57286DD1CADAB37BB86A9 /* ReadCopilotTests.xctest */;
+			productReference = DDC57286DD1CADAB37BB86A9 /* ReadCopilot.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		3F39448E4E3B50BB4D2374FE /* ReadCopilot */ = {
@@ -211,6 +214,7 @@
 			buildConfigurationList = 8540E529F3BA10D91CC5561D /* Build configuration list for PBXNativeTarget "ReadCopilot" */;
 			buildPhases = (
 				C62A25CD9468D09B9E8A416A /* Sources */,
+				46289A2608171A992C9E85C8 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -230,7 +234,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					1F894A20D6E29033176D527D = {
 						DevelopmentTeam = 3R847WPTLS;
@@ -261,6 +265,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		46289A2608171A992C9E85C8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2182BFBCB966E23CA542BB57 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		C62A25CD9468D09B9E8A416A /* Sources */ = {
@@ -319,6 +334,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ReadCopilot/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -341,6 +357,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -358,6 +375,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -390,10 +408,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 3R847WPTLS;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -416,6 +436,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = ReadCopilot;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -426,6 +447,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -458,10 +480,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 3R847WPTLS;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -477,6 +501,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = ReadCopilot;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.0;
@@ -488,6 +513,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = ReadCopilot/Info.plist;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -510,6 +536,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COMBINE_HIDPI_IMAGES = YES;
+				DEAD_CODE_STRIPPING = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

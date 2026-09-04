@@ -14,31 +14,41 @@ struct DashboardColumn: View {
             VStack(alignment: .leading, spacing: 20) {
 
                 // MARK: 顶部标题行
-                HStack {
-                    Text("阅读主页")
-                        .font(Theme.serifTitle(22))
-                        .foregroundStyle(Theme.ink)
-                    Spacer()
-                    Picker("统计周期", selection: Binding(
-                        get: { store.period },
-                        set: { newValue in Task { await store.syncAll(period: newValue) } }
-                    )) {
-                        ForEach(ReadingPeriod.allCases) { Text($0.rawValue).tag($0) }
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 260)
-                    if store.loading {
-                        ProgressView().controlSize(.small)
-                    } else {
-                        Button {
-                            Task { await store.syncAll() }
-                        } label: {
-                            Label("同步", systemImage: "arrow.clockwise")
-                                .font(Theme.body(13))
-                                .foregroundStyle(Theme.accent)
+                Group {
+                    #if os(iOS)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Text("阅读主页")
+                                .font(Theme.serifTitle(22))
+                                .foregroundStyle(Theme.ink)
+                            Spacer()
+                            syncButton
                         }
-                        .buttonStyle(.plain)
+                        Picker("统计周期", selection: Binding(
+                            get: { store.period },
+                            set: { newValue in Task { await store.syncAll(period: newValue) } }
+                        )) {
+                            ForEach(ReadingPeriod.allCases) { Text($0.rawValue).tag($0) }
+                        }
+                        .pickerStyle(.segmented)
                     }
+                    #else
+                    HStack {
+                        Text("阅读主页")
+                            .font(Theme.serifTitle(22))
+                            .foregroundStyle(Theme.ink)
+                        Spacer()
+                        Picker("统计周期", selection: Binding(
+                            get: { store.period },
+                            set: { newValue in Task { await store.syncAll(period: newValue) } }
+                        )) {
+                            ForEach(ReadingPeriod.allCases) { Text($0.rawValue).tag($0) }
+                        }
+                        .pickerStyle(.segmented)
+                        .frame(width: 260)
+                        syncButton
+                    }
+                    #endif
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 24)
@@ -156,6 +166,22 @@ struct DashboardColumn: View {
     private var completionRate: String {
         guard !store.readableBooks.isEmpty else { return "—" }
         return "\(Int((store.completionRate * 100).rounded()))%"
+    }
+
+    @ViewBuilder
+    private var syncButton: some View {
+        if store.loading {
+            ProgressView().controlSize(.small)
+        } else {
+            Button {
+                Task { await store.syncAll() }
+            } label: {
+                Label("同步", systemImage: "arrow.clockwise")
+                    .font(Theme.body(13))
+                    .foregroundStyle(Theme.accent)
+            }
+            .buttonStyle(.plain)
+        }
     }
 }
 

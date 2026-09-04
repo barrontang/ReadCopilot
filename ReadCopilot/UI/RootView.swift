@@ -25,6 +25,29 @@ struct RootView: View {
     @State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
 
     var body: some View {
+        #if os(iOS)
+        TabView(selection: $nav) {
+            DashboardColumn(store: store) { book in
+                selectedBookID = book.id
+                nav = .copilot
+            }
+            .tabItem { Label(Nav.home.rawValue, systemImage: Nav.home.icon) }
+            .tag(Nav.home)
+
+            CopilotWorkspace(store: store, knowledgeStore: knowledgeStore, selectedBookID: $selectedBookID)
+                .tabItem { Label(Nav.copilot.rawValue, systemImage: Nav.copilot.icon) }
+                .tag(Nav.copilot)
+
+            KnowledgeGraphView(books: store.books, knowledgeStore: knowledgeStore)
+                .tabItem { Label(Nav.knowledge.rawValue, systemImage: Nav.knowledge.icon) }
+                .tag(Nav.knowledge)
+
+            SettingsView()
+                .tabItem { Label(Nav.settings.rawValue, systemImage: Nav.settings.icon) }
+                .tag(Nav.settings)
+        }
+        .tint(Theme.accent)
+        #else
         NavigationSplitView(columnVisibility: $columnVisibility) {
             List(Nav.allCases) { item in
                 Button {
@@ -54,6 +77,7 @@ struct RootView: View {
         }
         .background(Theme.bg)
         .tint(Theme.accent)
+        #endif
         .dynamicTypeSize(.xSmall ... .accessibility5)
     }
 }

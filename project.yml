@@ -27,7 +27,23 @@ targets:
       path: ReadCopilot/Info.plist
       properties:
         CFBundleDisplayName: ReadCopilot
+        CFBundleIconFile: AppIcon
         LSApplicationCategoryType: public.app-category.productivity
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSAppTransportSecurity:
+          NSExceptionDomains:
+            wx.qlogo.cn:
+              NSExceptionAllowsInsecureHTTPLoads: true
     settings:
       base:
         INFOPLIST_KEY_NSHumanReadableCopyright: ""

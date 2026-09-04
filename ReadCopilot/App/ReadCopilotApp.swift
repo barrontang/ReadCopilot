@@ -12,7 +12,9 @@ struct ReadCopilotApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                #if os(macOS)
                 .frame(minWidth: 900, minHeight: 560)
+                #endif
                 .preferredColorScheme(.light)
         }
         #if os(macOS)
