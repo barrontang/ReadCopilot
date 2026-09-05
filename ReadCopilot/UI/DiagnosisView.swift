@@ -68,6 +68,7 @@ struct CopilotWorkspace: View {
             }
         }
         .background(Theme.bg)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 
@@ -189,6 +190,7 @@ struct DiagnosisColumn: View {
             }
         }
         .background(Theme.bg)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .navigationTitle(analysisTitle)
         .sheet(isPresented: $showExportPanel) {
             ExportPanel(books: books, report: model.report, notes: model.notes)
@@ -448,6 +450,7 @@ struct ExportPanel: View {
         let book: LibraryBook
         let notes: [ReadingNote]
         @State private var exportingMarkdown = false
+        @State private var exportingPDF = false
         @State private var exportError: String?
 
         private var content: String {
@@ -473,6 +476,18 @@ struct ExportPanel: View {
                             document: ReportDocument(data: Data(content.utf8)),
                             contentType: .plainText,
                             defaultFilename: "\(sanitize(book.title))_划线与笔记_\(DateFormatter.compact.string(from: Date())).md"
+                        ) { result in
+                            if case .failure(let error) = result {
+                                exportError = error.localizedDescription
+                            }
+                        }
+                    Button("导出 PDF") { exportingPDF = true }
+                        .buttonStyle(.bordered)
+                        .fileExporter(
+                            isPresented: $exportingPDF,
+                            document: ReportDocument(data: ReportExporter.pdf(from: content)),
+                            contentType: .pdf,
+                            defaultFilename: "\(sanitize(book.title))_划线与笔记_\(DateFormatter.compact.string(from: Date())).pdf"
                         ) { result in
                             if case .failure(let error) = result {
                                 exportError = error.localizedDescription

@@ -25,6 +25,7 @@ struct RootView: View {
     @State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
 
     var body: some View {
+        Group {
         #if os(iOS)
         TabView(selection: $nav) {
             DashboardColumn(store: store) { book in
@@ -78,6 +79,7 @@ struct RootView: View {
         .background(Theme.bg)
         .tint(Theme.accent)
         #endif
+        }
         .dynamicTypeSize(.xSmall ... .accessibility5)
     }
 }
