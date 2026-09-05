@@ -65,6 +65,7 @@ enum ReportExporter {
     }
 
     static func pdf(from text: String) -> Data {
+        let printableText = text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "暂无内容" : text
         let data = NSMutableData()
         var mediaBox = CGRect(x: 0, y: 0, width: 595, height: 842)
         guard let consumer = CGDataConsumer(data: data),
@@ -79,7 +80,7 @@ enum ReportExporter {
             : CTFontCreateUIFontForLanguage(.system, 11, "zh-Hans" as CFString) ?? preferred
 
         let attributed = NSAttributedString(
-            string: text,
+            string: printableText,
             attributes: [
                 NSAttributedString.Key(kCTFontAttributeName as String): font,
                 NSAttributedString.Key(kCTForegroundColorAttributeName as String):
@@ -91,11 +92,15 @@ enum ReportExporter {
 
         while range.location < attributed.length {
             context.beginPDFPage(nil)
+            context.saveGState()
             context.textMatrix = .identity
+            context.translateBy(x: 0, y: mediaBox.height)
+            context.scaleBy(x: 1, y: -1)
             let path = CGPath(rect: mediaBox.insetBy(dx: 48, dy: 48), transform: nil)
             let frame = CTFramesetterCreateFrame(framesetter, range, path, nil)
             CTFrameDraw(frame, context)
             let visible = CTFrameGetVisibleStringRange(frame)
+            context.restoreGState()
             context.endPDFPage()
             guard visible.length > 0 else { break }
             range.location += visible.length

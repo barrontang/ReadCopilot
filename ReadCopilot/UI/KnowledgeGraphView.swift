@@ -152,7 +152,8 @@ private struct TopicFilterBar: View {
                     .font(Theme.body(12))
                     .foregroundStyle(Theme.inkSecondary)
             } else {
-                ScrollView(.horizontal, showsIndicators: false) {
+                // 显示滚动条，让用户能感知并全量查看所有主题（主题数量较多时会横向溢出）
+                ScrollView(.horizontal, showsIndicators: true) {
                     HStack(spacing: 8) {
                         ForEach(topics, id: \.topic) { item in
                             Button {

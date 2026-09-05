@@ -20,6 +20,8 @@ enum Nav: String, CaseIterable, Identifiable {
 struct RootView: View {
     @StateObject private var store = LibraryStore()
     @StateObject private var knowledgeStore = KnowledgeStore()
+    // 生命周期与 App 绑定，确保切到其他 Tab/导航项时正在后台运行的分析任务不被销毁
+    @StateObject private var diagnosisSessionStore = DiagnosisSessionStore()
     @State private var nav: Nav = .home
     @State private var selectedBookID = ""
     @State private var columnVisibility: NavigationSplitViewVisibility = .doubleColumn
@@ -35,7 +37,7 @@ struct RootView: View {
             .tabItem { Label(Nav.home.rawValue, systemImage: Nav.home.icon) }
             .tag(Nav.home)
 
-            CopilotWorkspace(store: store, knowledgeStore: knowledgeStore, selectedBookID: $selectedBookID)
+            CopilotWorkspace(store: store, knowledgeStore: knowledgeStore, sessionStore: diagnosisSessionStore, selectedBookID: $selectedBookID)
                 .tabItem { Label(Nav.copilot.rawValue, systemImage: Nav.copilot.icon) }
                 .tag(Nav.copilot)
 
@@ -69,7 +71,7 @@ struct RootView: View {
                     nav = .copilot
                 }
             case .copilot:
-                CopilotWorkspace(store: store, knowledgeStore: knowledgeStore, selectedBookID: $selectedBookID)
+                CopilotWorkspace(store: store, knowledgeStore: knowledgeStore, sessionStore: diagnosisSessionStore, selectedBookID: $selectedBookID)
             case .knowledge:
                 KnowledgeGraphView(books: store.books, knowledgeStore: knowledgeStore)
             case .settings:

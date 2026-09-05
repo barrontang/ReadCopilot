@@ -1,6 +1,95 @@
 import Foundation
 import UserNotifications
 
+// MARK: - 诊断会话仓库
+// 职责：按分析目标（范围+书籍+模板）持有对应的 DiagnosisModel 实例，
+// 使其生命周期与 App 根视图绑定，而不依赖某个子视图是否在屏幕上。
+// 这样用户切到其他 Tab/导航项后，后台分析任务与进度不会被销毁，
+// 待分析完成后回到 Copilot 页依然能看到结果（并已发出本地通知）。
+// 同时维护「已分析工作列表」，供用户随时查看所有分析任务的状态并跳转查看。
+@MainActor
+final class DiagnosisSessionStore: ObservableObject {
+    /// 一项分析工作的元信息，用于在「已分析工作列表」中展示与重新定位。
+    struct Job: Identifiable {
+        let id: String
+        let scope: AnalysisScope
+        let selectedCategory: String
+        let books: [LibraryBook]
+        let template: AnalysisTemplate
+        let createdAt: Date
+
+        var title: String {
+            if books.count == 1, let book = books.first {
+                return "《\(book.title)》"
+            }
+            return "\(books.count) 本书"
+        }
+    }
+
+    @Published private(set) var jobs: [Job] = []
+    private var models: [String: DiagnosisModel] = [:]
+
+    /// 获取（或创建）某个分析目标对应的 DiagnosisModel。
+    /// key 由调用方基于范围/书籍集合/模板拼出，保证同一目标复用同一实例。
+    func model(for key: String) -> DiagnosisModel {
+        if let existing = models[key] {
+            return existing
+        }
+        let created = DiagnosisModel()
+        models[key] = created
+        return created
+    }
+
+    /// 已存在的 model（不创建新实例），用于列表展示时只读取状态。
+    func existingModel(for key: String) -> DiagnosisModel? {
+        models[key]
+    }
+
+    /// 用户实际点击「开始分析」时登记一项工作，使其出现在「已分析工作列表」中。
+    /// 若同一 key 已登记过（比如重试），仅更新排序时间到最新，不产生重复条目。
+    func registerJob(
+        key: String,
+        scope: AnalysisScope,
+        selectedCategory: String,
+        books: [LibraryBook],
+        template: AnalysisTemplate
+    ) {
+        jobs.removeAll { $0.id == key }
+        jobs.insert(
+            Job(
+                id: key,
+                scope: scope,
+                selectedCategory: selectedCategory,
+                books: books,
+                template: template,
+                createdAt: Date()
+            ),
+            at: 0
+        )
+    }
+
+    /// 当前是否存在仍在后台运行（获取笔记中/生成中）的分析工作。
+    var hasRunningJobs: Bool {
+        jobs.contains { job in
+            guard let model = models[job.id] else { return false }
+            switch model.state {
+            case .fetchingNotes, .generating: return true
+            default: return false
+            }
+        }
+    }
+
+    var runningJobCount: Int {
+        jobs.filter { job in
+            guard let model = models[job.id] else { return false }
+            switch model.state {
+            case .fetchingNotes, .generating: return true
+            default: return false
+            }
+        }.count
+    }
+}
+
 // MARK: - 诊断编排器
 // 职责：状态机 + 进度发布 + 完成通知。
 // 取数解析在 WeReadNotesService，Prompt/LLM 在 AnalysisService。

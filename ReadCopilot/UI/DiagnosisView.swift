@@ -3,10 +3,12 @@ import SwiftUI
 struct CopilotWorkspace: View {
     @ObservedObject var store: LibraryStore
     @ObservedObject var knowledgeStore: KnowledgeStore
+    @ObservedObject var sessionStore: DiagnosisSessionStore
     @Binding var selectedBookID: String
     @State private var scope: AnalysisScope = .book
     @State private var template: AnalysisTemplate = .coach
     @State private var selectedCategory = ""
+    @State private var showJobList = false
 
     private var categories: [String] {
         Array(Set(store.books.map(\.category).filter { !$0.isEmpty })).sorted()
@@ -26,8 +28,26 @@ struct CopilotWorkspace: View {
     var body: some View {
         VStack(spacing: 0) {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Copilot 分析工作台")
-                    .font(Theme.serifTitle(22))
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Copilot 分析工作台")
+                        .font(Theme.serifTitle(22))
+                    Spacer()
+                    Button {
+                        showJobList = true
+                    } label: {
+                        if sessionStore.hasRunningJobs {
+                            Label("\(sessionStore.runningJobCount) 项分析进行中", systemImage: "clock.arrow.circlepath")
+                                .font(Theme.body(12))
+                                .foregroundStyle(Theme.accent)
+                        } else {
+                            Label("已分析工作列表", systemImage: "list.bullet.rectangle")
+                                .font(Theme.body(12))
+                                .foregroundStyle(Theme.inkSecondary)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(sessionStore.jobs.isEmpty)
+                }
                 Picker("范围", selection: $scope) {
                     ForEach(AnalysisScope.allCases) { Text($0.rawValue).tag($0) }
                 }
@@ -63,12 +83,30 @@ struct CopilotWorkspace: View {
                     systemImage: "sparkles.rectangle.stack"
                 )
             } else {
-                DiagnosisColumn(books: selectedBooks, template: template, knowledgeStore: knowledgeStore)
-                    .id("\(scope.rawValue)-\(selectedBooks.map(\.id).joined())-\(template.rawValue)")
+                DiagnosisColumn(
+                    books: selectedBooks,
+                    template: template,
+                    scope: scope,
+                    selectedCategory: selectedCategory,
+                    knowledgeStore: knowledgeStore,
+                    sessionStore: sessionStore
+                )
+                .id("\(scope.rawValue)-\(selectedBooks.map(\.id).joined())-\(template.rawValue)")
             }
         }
         .background(Theme.bg)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        .sheet(isPresented: $showJobList) {
+            DiagnosisJobListView(sessionStore: sessionStore) { job in
+                scope = job.scope
+                selectedCategory = job.selectedCategory
+                if job.scope == .book, let first = job.books.first {
+                    selectedBookID = first.id
+                }
+                template = job.template
+                showJobList = false
+            }
+        }
     }
 }
 
@@ -78,14 +116,40 @@ struct CopilotWorkspace: View {
 struct DiagnosisColumn: View {
     let books: [LibraryBook]
     let template: AnalysisTemplate
+    let scope: AnalysisScope
+    let selectedCategory: String
     @ObservedObject var knowledgeStore: KnowledgeStore
-    @StateObject private var model = DiagnosisModel()
+    @ObservedObject var sessionStore: DiagnosisSessionStore
+    @ObservedObject private var model: DiagnosisModel
     @State private var showExportPanel = false
     @State private var showNotesExportPanel = false
     @State private var showConsent = false
     @State private var standaloneNotes: [ReadingNote] = []
     @State private var loadingBookNotes = false
     @State private var bookNotesMessage: String?
+
+    private let jobKey: String
+
+    init(
+        books: [LibraryBook],
+        template: AnalysisTemplate,
+        scope: AnalysisScope,
+        selectedCategory: String,
+        knowledgeStore: KnowledgeStore,
+        sessionStore: DiagnosisSessionStore
+    ) {
+        self.books = books
+        self.template = template
+        self.scope = scope
+        self.selectedCategory = selectedCategory
+        self.knowledgeStore = knowledgeStore
+        self.sessionStore = sessionStore
+        // key 与外层 .id() 保持一致的语义，确保同一分析目标始终复用同一个
+        // DiagnosisModel 实例，即使承载它的视图（DiagnosisColumn）被重建/切走。
+        let key = "\(books.map(\.id).sorted().joined(separator: ","))-\(template.rawValue)"
+        self.jobKey = key
+        _model = ObservedObject(wrappedValue: sessionStore.model(for: key))
+    }
 
     private var primaryBook: LibraryBook? { books.first }
     private var analysisTitle: String {
@@ -203,6 +267,13 @@ struct DiagnosisColumn: View {
         .alert("发送笔记进行分析？", isPresented: $showConsent) {
             Button("取消", role: .cancel) {}
             Button("同意并开始") {
+                sessionStore.registerJob(
+                    key: jobKey,
+                    scope: scope,
+                    selectedCategory: selectedCategory,
+                    books: books,
+                    template: template
+                )
                 model.run(books: books, template: template)
             }
         } message: {
@@ -422,6 +493,91 @@ struct DiagnosisErrorView: View {
                     .foregroundStyle(Theme.accent)
             }
             .buttonStyle(.plain)
+        }
+    }
+}
+
+// MARK: - 已分析工作列表（后台分析任务的进行中/已完成状态一览）
+struct DiagnosisJobListView: View {
+    @Environment(\.dismiss) var dismiss
+    @ObservedObject var sessionStore: DiagnosisSessionStore
+    let onSelect: (DiagnosisSessionStore.Job) -> Void
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if sessionStore.jobs.isEmpty {
+                    ContentUnavailableView("暂无分析任务", systemImage: "sparkles.rectangle.stack")
+                } else {
+                    ForEach(sessionStore.jobs) { job in
+                        Button {
+                            onSelect(job)
+                        } label: {
+                            JobRow(job: job, model: sessionStore.existingModel(for: job.id))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            .navigationTitle("已分析工作列表")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("关闭") { dismiss() }
+                }
+            }
+        }
+        #if os(macOS)
+        .frame(minWidth: 420, minHeight: 360)
+        #endif
+    }
+
+    private struct JobRow: View {
+        let job: DiagnosisSessionStore.Job
+        let model: DiagnosisModel?
+
+        var body: some View {
+            HStack(spacing: 12) {
+                statusIcon
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(job.title)
+                        .font(Theme.body(14))
+                        .foregroundStyle(Theme.ink)
+                    Text("\(job.template.rawValue) · \(job.scope.rawValue)")
+                        .font(Theme.body(12))
+                        .foregroundStyle(Theme.inkSecondary)
+                }
+                Spacer()
+                statusLabel
+            }
+            .padding(.vertical, 4)
+        }
+
+        @ViewBuilder private var statusIcon: some View {
+            switch model?.state {
+            case .fetchingNotes, .generating:
+                ProgressView().controlSize(.small)
+            case .done:
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.success)
+            case .failed:
+                Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
+            default:
+                Image(systemName: "circle.dashed").foregroundStyle(Theme.inkSecondary)
+            }
+        }
+
+        @ViewBuilder private var statusLabel: some View {
+            switch model?.state {
+            case .fetchingNotes:
+                Text("获取笔记中…").font(Theme.body(12)).foregroundStyle(Theme.inkSecondary)
+            case .generating:
+                Text("分析进行中…").font(Theme.body(12)).foregroundStyle(Theme.inkSecondary)
+            case .done:
+                Text("已完成").font(Theme.body(12)).foregroundStyle(Theme.success)
+            case .failed:
+                Text("失败").font(Theme.body(12)).foregroundStyle(.orange)
+            default:
+                Text("待开始").font(Theme.body(12)).foregroundStyle(Theme.inkSecondary)
+            }
         }
     }
 }
