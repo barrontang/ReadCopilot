@@ -498,6 +498,8 @@ struct CategoryChart: View {
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
+                            .accessibilityLabel("查看\(item.category)类别下钻")
+                            .accessibilityHint("打开该类别的阅读明细")
                         }
                     }
                 }

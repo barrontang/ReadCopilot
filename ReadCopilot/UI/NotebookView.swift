@@ -127,8 +127,13 @@ struct NotebookView: View {
             HStack {
                 Toggle("日期范围", isOn: $model.useDateRange)
                 if model.useDateRange {
-                    DatePicker("从", selection: $model.fromDate, displayedComponents: .date)
-                    DatePicker("到", selection: $model.toDate, displayedComponents: .date)
+                    GroupBox("筛选日期") {
+                        HStack {
+                            DatePicker("开始日期", selection: $model.fromDate, displayedComponents: .date)
+                            DatePicker("结束日期", selection: $model.toDate, displayedComponents: .date)
+                        }
+                    }
+                    .frame(maxWidth: 420)
                 }
                 Spacer()
                 Button {
@@ -211,8 +216,8 @@ private struct NotebookEntryRow: View {
                 Spacer()
                 Button("去 Copilot 分析") { openCopilot(entry.note.bookID) }
                     .font(Theme.body(11))
-                    .buttonStyle(.plain)
-                    .foregroundStyle(Theme.accent)
+                    .buttonStyle(.bordered)
+                    .controlSize(.small)
             }
         }
         .padding(12)
