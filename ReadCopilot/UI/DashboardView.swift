@@ -493,12 +493,19 @@ struct CategoryChart: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(data) { item in
-                            Button("\(item.category) \(item.count)") {
+                            Button {
                                 onSelect(item.category)
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Text(item.category)
+                                    Text("(\(item.count))")
+                                        .foregroundStyle(Theme.inkSecondary)
+                                }
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
                             .accessibilityLabel("查看\(item.category)类别下钻")
+                            .accessibilityValue("\(item.count) 本")
                             .accessibilityHint("打开该类别的阅读明细")
                         }
                     }

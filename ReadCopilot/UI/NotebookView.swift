@@ -97,8 +97,11 @@ struct NotebookView: View {
         }
         .background(Theme.bg)
         .navigationTitle("Notebook")
-        .task {
+        .onAppear {
             model.selectedBookID = selectedBookID
+            model.reload()
+        }
+        .onChange(of: books.map(\.id).joined(separator: ",")) { _, _ in
             model.reload()
         }
         .onChange(of: selectedBookID) { _, newValue in

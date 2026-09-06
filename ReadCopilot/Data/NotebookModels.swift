@@ -76,11 +76,11 @@ enum NotebookComposer {
             )
         }
         .sorted { lhs, rhs in
+            if sourcePriority(lhs.orderSource) != sourcePriority(rhs.orderSource) {
+                return sourcePriority(lhs.orderSource) < sourcePriority(rhs.orderSource)
+            }
             if lhs.readingOrderKey != rhs.readingOrderKey {
                 return lhs.readingOrderKey < rhs.readingOrderKey
-            }
-            if lhs.orderSource != rhs.orderSource {
-                return sourcePriority(lhs.orderSource) < sourcePriority(rhs.orderSource)
             }
             if lhs.timelineDate != rhs.timelineDate {
                 return lhs.timelineDate < rhs.timelineDate
