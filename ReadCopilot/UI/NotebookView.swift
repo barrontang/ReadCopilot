@@ -23,6 +23,7 @@ final class NotebookViewModel: ObservableObject {
     }
 
     func sync(book: LibraryBook) async {
+        guard !loading else { return }
         loading = true
         message = nil
         defer { loading = false }

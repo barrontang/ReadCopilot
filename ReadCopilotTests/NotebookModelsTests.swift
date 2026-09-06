@@ -47,7 +47,7 @@ final class NotebookModelsTests: XCTestCase {
         ]
 
         let entries = NotebookComposer.compose(notes: notes)
-        XCTAssertEqual(entries.map(\.id), ["source-order", "location", "synced", "event"])
+        XCTAssertEqual(entries.map(\.id), ["event", "location", "source-order", "synced"])
         XCTAssertEqual(entries.first(where: { $0.id == "event" })?.orderSource, .eventTime)
         XCTAssertEqual(entries.first(where: { $0.id == "location" })?.orderSource, .location)
         XCTAssertEqual(entries.first(where: { $0.id == "source-order" })?.orderSource, .sourceOrder)

@@ -40,12 +40,22 @@ enum NotebookBookFilter: String, CaseIterable, Identifiable {
 enum NotebookComposer {
     static func compose(notes: [ReadingNote]) -> [NotebookEntry] {
         notes.map { note in
+            let timelineDate = note.eventTime ?? note.syncedAt
+            if let eventTime = note.eventTime {
+                return NotebookEntry(
+                    id: note.id,
+                    note: note,
+                    timelineDate: eventTime,
+                    readingOrderKey: prioritizedOrderKey(priority: 0, value: baseDateOrderKey(eventTime)),
+                    orderSource: .eventTime
+                )
+            }
             if let location = note.location {
                 return NotebookEntry(
                     id: note.id,
                     note: note,
-                    timelineDate: note.eventTime ?? note.syncedAt,
-                    readingOrderKey: Int64(location),
+                    timelineDate: timelineDate,
+                    readingOrderKey: prioritizedOrderKey(priority: 1, value: Int64(location)),
                     orderSource: .location
                 )
             }
@@ -53,25 +63,16 @@ enum NotebookComposer {
                 return NotebookEntry(
                     id: note.id,
                     note: note,
-                    timelineDate: note.syncedAt,
-                    readingOrderKey: Int64(sourceOrder),
+                    timelineDate: timelineDate,
+                    readingOrderKey: prioritizedOrderKey(priority: 2, value: Int64(sourceOrder)),
                     orderSource: .sourceOrder
-                )
-            }
-            if let eventTime = note.eventTime {
-                return NotebookEntry(
-                    id: note.id,
-                    note: note,
-                    timelineDate: eventTime,
-                    readingOrderKey: normalizedOrderKey(baseDate: eventTime),
-                    orderSource: .eventTime
                 )
             }
             return NotebookEntry(
                 id: note.id,
                 note: note,
                 timelineDate: note.syncedAt,
-                readingOrderKey: normalizedOrderKey(baseDate: note.syncedAt),
+                readingOrderKey: prioritizedOrderKey(priority: 3, value: baseDateOrderKey(note.syncedAt)),
                 orderSource: .syncedAt
             )
         }
@@ -102,9 +103,12 @@ enum NotebookComposer {
             .map { (day: $0.day, entries: $0.entries) }
     }
 
-    private static func normalizedOrderKey(baseDate: Date, fallback: Int64 = 0) -> Int64 {
-        let ms = Int64(baseDate.timeIntervalSince1970 * 1000)
-        return ms * 1_000_000 + max(fallback, 0)
+    private static func baseDateOrderKey(_ date: Date) -> Int64 {
+        Int64(date.timeIntervalSince1970 * 1000)
+    }
+
+    private static func prioritizedOrderKey(priority: Int64, value: Int64) -> Int64 {
+        priority * 1_000_000_000_000_000 + max(value, 0)
     }
 }
 

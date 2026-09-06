@@ -493,18 +493,19 @@ struct CategoryChart: View {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 8) {
                         ForEach(data) { item in
+                            let categoryName = item.category.isEmpty ? "未分类" : item.category
                             Button {
                                 onSelect(item.category)
                             } label: {
                                 HStack(spacing: 4) {
-                                    Text(item.category)
+                                    Text(categoryName)
                                     Text("(\(item.count))")
                                         .foregroundStyle(Theme.inkSecondary)
                                 }
                             }
                             .buttonStyle(.bordered)
                             .controlSize(.small)
-                            .accessibilityLabel("查看\(item.category)类别下钻")
+                            .accessibilityLabel("查看\(categoryName)类别下钻")
                             .accessibilityValue("\(item.count) 本")
                             .accessibilityHint("打开该类别的阅读明细")
                         }
