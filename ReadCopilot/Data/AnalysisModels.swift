@@ -104,4 +104,35 @@ struct ReadingNote: Identifiable, Hashable {
     let kind: Kind
     let sourceText: String
     let noteText: String
+    let eventTime: Date?
+    let chapterTitle: String
+    let location: Int?
+    let sourceOrder: Int?
+    let syncedAt: Date
+
+    init(
+        id: String,
+        bookID: String,
+        bookTitle: String,
+        kind: Kind,
+        sourceText: String,
+        noteText: String,
+        eventTime: Date? = nil,
+        chapterTitle: String = "",
+        location: Int? = nil,
+        sourceOrder: Int? = nil,
+        syncedAt: Date = Date()
+    ) {
+        self.id = id
+        self.bookID = bookID
+        self.bookTitle = bookTitle
+        self.kind = kind
+        self.sourceText = sourceText
+        self.noteText = noteText
+        self.eventTime = eventTime
+        self.chapterTitle = chapterTitle
+        self.location = location
+        self.sourceOrder = sourceOrder
+        self.syncedAt = syncedAt
+    }
 }

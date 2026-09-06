@@ -6,6 +6,7 @@ import Foundation
 enum LLMError: LocalizedError {
     case missingConfig
     case badURL
+    case insecureBaseURL
     case http(Int, String)
     case decoding(String)
     case empty
@@ -14,6 +15,7 @@ enum LLMError: LocalizedError {
         switch self {
         case .missingConfig: return "未设置 LLM Key 或 Base URL"
         case .badURL: return "Base URL 格式错误"
+        case .insecureBaseURL: return "Base URL 必须使用 HTTPS（本地 Ollama 可使用 HTTP）"
         case .http(let c, let m): return "接口错误 HTTP \(c): \(m)"
         case .decoding(let m): return "解析失败: \(m)"
         case .empty: return "模型返回为空"
@@ -37,6 +39,11 @@ struct LLMClient {
     private func endpoint() throws -> URL {
         var base = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
         if base.hasSuffix("/") { base.removeLast() }
+        guard let rawURL = URL(string: base) else { throw LLMError.badURL }
+        let isLocal = rawURL.host == "localhost" || rawURL.host == "127.0.0.1"
+        if rawURL.scheme?.lowercased() != "https" && !isLocal {
+            throw LLMError.insecureBaseURL
+        }
         guard let url = URL(string: base + "/chat/completions") else { throw LLMError.badURL }
         return url
     }

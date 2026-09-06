@@ -8,6 +8,8 @@ import Charts
 struct DashboardColumn: View {
     @ObservedObject var store: LibraryStore
     let openBook: (LibraryBook) -> Void
+    let openNotebook: (LibraryBook) -> Void
+    @State private var drilldown: DashboardDrilldown?
 
     var body: some View {
         ScrollView {
@@ -65,48 +67,13 @@ struct DashboardColumn: View {
                     LazyVGrid(columns: [
                         GridItem(.adaptive(minimum: 140), spacing: 12),
                     ], spacing: 12) {
-                        StatCard(
-                            icon: "clock.fill",
-                            iconColor: Theme.accent,
-                            label: "累计阅读",
-                            value: LibraryStore.fmtDuration(store.profile.totalReadTime)
-                        )
-                        StatCard(
-                            icon: "calendar",
-                            iconColor: .orange,
-                            label: "阅读天数",
-                            value: "\(store.profile.readDays) 天"
-                        )
-                        StatCard(
-                            icon: "books.vertical.fill",
-                            iconColor: Theme.info,
-                            label: "书架总数",
-                            value: "\(store.totalShelfItems) 本"
-                        )
-                        StatCard(
-                            icon: "checkmark.seal.fill",
-                            iconColor: Theme.success,
-                            label: "读完",
-                            value: "\(store.books.filter { $0.finished }.count) 本"
-                        )
-                        StatCard(
-                            icon: "percent",
-                            iconColor: Theme.accent,
-                            label: "完读率",
-                            value: completionRate
-                        )
-                        StatCard(
-                            icon: "flame.fill",
-                            iconColor: .orange,
-                            label: "阅读历程",
-                            value: store.readingStreak > 0 ? "\(store.readingStreak) 天" : "—"
-                        )
-                        StatCard(
-                            icon: "chart.line.uptrend.xyaxis",
-                            iconColor: .purple,
-                            label: "日均阅读",
-                            value: store.averageDailyReadTime > 0 ? LibraryStore.fmtDuration(store.averageDailyReadTime) : "—"
-                        )
+                        drilldownCard(.trend, icon: "clock.fill", color: Theme.accent, label: "累计阅读", value: LibraryStore.fmtDuration(store.profile.totalReadTime))
+                        drilldownCard(.calendar, icon: "calendar", color: .orange, label: "阅读天数", value: "\(store.profile.readDays) 天")
+                        drilldownCard(.books, icon: "books.vertical.fill", color: Theme.info, label: "书架总数", value: "\(store.totalShelfItems) 本")
+                        drilldownCard(.books, icon: "checkmark.seal.fill", color: Theme.success, label: "读完", value: "\(store.books.filter { $0.finished }.count) 本")
+                        drilldownCard(.trend, icon: "percent", color: Theme.accent, label: "完读率", value: completionRate)
+                        drilldownCard(.calendar, icon: "flame.fill", color: .orange, label: "阅读历程", value: store.readingStreak > 0 ? "\(store.readingStreak) 天" : "—")
+                        drilldownCard(.trend, icon: "chart.line.uptrend.xyaxis", color: .purple, label: "日均阅读", value: store.averageDailyReadTime > 0 ? LibraryStore.fmtDuration(store.averageDailyReadTime) : "—")
                     }
                     .padding(.horizontal, 24)
 
@@ -134,16 +101,18 @@ struct DashboardColumn: View {
                     // MARK: 品类分布(书架)
                     let categoryData = store.categoryDistribution
                     if !categoryData.isEmpty {
-                        CategoryChart(data: categoryData)
+                        CategoryChart(data: categoryData) { category in
+                            drilldown = DashboardDrilldown(kind: .category, title: category)
+                        }
                             .padding(.horizontal, 24)
                     }
 
                     if !store.recentBooks.isEmpty {
-                        RecentBooksRow(books: store.recentBooks)
+                        RecentBooksRow(books: store.recentBooks, openBook: openBook, openNotebook: openNotebook)
                             .padding(.horizontal, 24)
                     }
 
-                    LibraryShelfSection(books: store.books, openBook: openBook)
+                    LibraryShelfSection(books: store.books, openBook: openBook, openNotebook: openNotebook)
                         .padding(.horizontal, 24)
 
                     // MARK: 底部同步时间
@@ -161,6 +130,9 @@ struct DashboardColumn: View {
         .background(Theme.bg)
         .navigationTitle("阅读主页")
         .task { if store.books.isEmpty && !store.loading { await store.syncAll() } }
+        .sheet(item: $drilldown) { target in
+            DashboardDrilldownView(target: target, period: store.period)
+        }
     }
 
     private var completionRate: String {
@@ -179,6 +151,15 @@ struct DashboardColumn: View {
                 Label("同步", systemImage: "arrow.clockwise")
                     .font(Theme.body(13))
                     .foregroundStyle(Theme.accent)
+            }
+            .buttonStyle(.plain)
+        }
+
+        private func drilldownCard(_ kind: DashboardDrilldown.Kind, icon: String, color: Color, label: String, value: String) -> some View {
+            Button {
+                drilldown = DashboardDrilldown(kind: kind, title: label)
+            } label: {
+                StatCard(icon: icon, iconColor: color, label: label, value: value)
             }
             .buttonStyle(.plain)
         }
@@ -229,6 +210,7 @@ struct ReadingOverview: View {
 struct LibraryShelfSection: View {
         let books: [LibraryBook]
         let openBook: (LibraryBook) -> Void
+        let openNotebook: (LibraryBook) -> Void
         @State private var query = ""
         @State private var filter: BookListColumn.FilterState = .all
 
@@ -275,6 +257,10 @@ struct LibraryShelfSection: View {
                                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(Theme.hairline))
                         }
                         .buttonStyle(.plain)
+                        .contextMenu {
+                            Button("在 Copilot 打开") { openBook(book) }
+                            Button("在 Notebook 打开") { openNotebook(book) }
+                        }
                     }
                 }
             }
@@ -470,6 +456,7 @@ struct CategoryItem: Identifiable {
 
 struct CategoryChart: View {
     let data: [CategoryItem]
+    let onSelect: (String) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -502,6 +489,19 @@ struct CategoryChart: View {
             .background(Theme.panel)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Theme.hairline, lineWidth: 1))
+            if !data.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(data) { item in
+                            Button("\(item.category) \(item.count)") {
+                                onSelect(item.category)
+                            }
+                            .buttonStyle(.bordered)
+                            .controlSize(.small)
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -509,6 +509,8 @@ struct CategoryChart: View {
 // MARK: - 最近阅读横向滚动
 struct RecentBooksRow: View {
     let books: [LibraryBook]
+    let openBook: (LibraryBook) -> Void
+    let openNotebook: (LibraryBook) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -518,7 +520,7 @@ struct RecentBooksRow: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(books) { book in
-                        BookThumbCard(book: book)
+                        BookThumbCard(book: book, openBook: openBook, openNotebook: openNotebook)
                     }
                 }
                 .padding(.vertical, 4)
@@ -529,9 +531,14 @@ struct RecentBooksRow: View {
 
 struct BookThumbCard: View {
     let book: LibraryBook
+    let openBook: (LibraryBook) -> Void
+    let openNotebook: (LibraryBook) -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        Button {
+            openBook(book)
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
             // 封面占位 (异步加载)
             AsyncImage(url: URL(string: book.cover)) { phase in
                 switch phase {
@@ -563,8 +570,62 @@ struct BookThumbCard: View {
                     .font(.system(size: 9))
                     .foregroundStyle(Theme.success)
             }
+            }
+            .frame(width: 72)
         }
-        .frame(width: 72)
+        .buttonStyle(.plain)
+        .contextMenu {
+            Button("在 Notebook 打开") { openNotebook(book) }
+        }
+    }
+}
+
+private struct DashboardDrilldown: Identifiable {
+    enum Kind {
+        case trend
+        case calendar
+        case books
+        case category
+    }
+
+    let id = UUID()
+    let kind: Kind
+    let title: String
+}
+
+private struct DashboardDrilldownView: View {
+    let target: DashboardDrilldown
+    let period: ReadingPeriod
+
+    var body: some View {
+        NavigationStack {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(target.title)
+                    .font(Theme.serifTitle(20))
+                Text("当前周期：\(period.rawValue)")
+                    .font(Theme.body(12))
+                    .foregroundStyle(Theme.inkSecondary)
+                Text(description)
+                    .font(Theme.body(13))
+                    .foregroundStyle(Theme.inkSecondary)
+                Spacer()
+            }
+            .padding(20)
+            .navigationTitle("数据下钻")
+        }
+    }
+
+    private var description: String {
+        switch target.kind {
+        case .trend:
+            return "这里将承载趋势图和同比环比视图。"
+        case .calendar:
+            return "这里将承载日历分布和单日明细。"
+        case .books:
+            return "这里将承载书籍维度明细和筛选。"
+        case .category:
+            return "这里将承载类别分布和类别内图书明细。"
+        }
     }
 }
 
@@ -609,6 +670,6 @@ struct ErrorBanner: View {
 }
 
 #Preview {
-    DashboardColumn(store: LibraryStore(), openBook: { _ in })
+    DashboardColumn(store: LibraryStore(), openBook: { _ in }, openNotebook: { _ in })
         .frame(width: 700, height: 800)
 }

@@ -63,7 +63,11 @@ final class PersistentReadingNote {
     var kind: String  // "highlight" or "thought"
     var sourceText: String
     var noteText: String
-    var createdAt: Date
+    var eventTime: Date?
+    var chapterTitle: String
+    var location: Int?
+    var sourceOrder: Int?
+    var syncedAt: Date
     
     /// Inverse relationship to PersistentBook
     var book: PersistentBook?
@@ -75,7 +79,11 @@ final class PersistentReadingNote {
         self.kind = readingNote.kind.rawValue
         self.sourceText = readingNote.sourceText
         self.noteText = readingNote.noteText
-        self.createdAt = Date()
+        self.eventTime = readingNote.eventTime
+        self.chapterTitle = readingNote.chapterTitle
+        self.location = readingNote.location
+        self.sourceOrder = readingNote.sourceOrder
+        self.syncedAt = readingNote.syncedAt
         self.book = book
     }
     
@@ -87,7 +95,12 @@ final class PersistentReadingNote {
             bookTitle: bookTitle,
             kind: ReadingNote.Kind(rawValue: kind) ?? .highlight,
             sourceText: sourceText,
-            noteText: noteText
+            noteText: noteText,
+            eventTime: eventTime,
+            chapterTitle: chapterTitle,
+            location: location,
+            sourceOrder: sourceOrder,
+            syncedAt: syncedAt
         )
     }
 }

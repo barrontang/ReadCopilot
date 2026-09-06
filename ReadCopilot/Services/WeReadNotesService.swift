@@ -50,13 +50,19 @@ struct WeReadNotesService {
         let highlights = (bookmarks["updated"] as? [[String: Any]] ?? []).compactMap { item -> ReadingNote? in
             guard let text = item["markText"] as? String, !text.isEmpty else { return nil }
             let rawID = item["bookmarkId"] as? String ?? UUID().uuidString
+            let timestamp = timestamp(from: item, keys: ["createTime", "updateTime", "timestamp", "time"])
+            let chapter = item["chapterTitle"] as? String ?? item["chapterUid"] as? String ?? ""
+            let location = int(from: item, keys: ["range", "position", "start"])
             return ReadingNote(
                 id: "\(book.id)-highlight-\(rawID)",
                 bookID: book.id,
                 bookTitle: book.title,
                 kind: .highlight,
                 sourceText: text,
-                noteText: ""
+                noteText: "",
+                eventTime: timestamp,
+                chapterTitle: chapter,
+                location: location
             )
         }
         let thoughts = (reviews["reviews"] as? [[String: Any]] ?? []).compactMap { item -> ReadingNote? in
@@ -65,15 +71,60 @@ struct WeReadNotesService {
                   !content.isEmpty else { return nil }
             let source = review["abstract"] as? String ?? ""
             let rawID = review["reviewId"] as? String ?? UUID().uuidString
+            let timestamp = timestamp(from: review, keys: ["createTime", "updateTime", "timestamp", "time"])
+                ?? timestamp(from: item, keys: ["createTime", "updateTime", "timestamp", "time"])
+            let chapter = review["chapterTitle"] as? String ?? ""
+            let location = int(from: review, keys: ["range", "position", "start"])
             return ReadingNote(
                 id: "\(book.id)-thought-\(rawID)",
                 bookID: book.id,
                 bookTitle: book.title,
                 kind: .thought,
                 sourceText: source.isEmpty ? "（无对应原文）" : source,
-                noteText: content
+                noteText: content,
+                eventTime: timestamp,
+                chapterTitle: chapter,
+                location: location
             )
         }
-        return highlights + thoughts
+        let merged = highlights + thoughts
+        return merged.enumerated().map { index, note in
+            ReadingNote(
+                id: note.id,
+                bookID: note.bookID,
+                bookTitle: note.bookTitle,
+                kind: note.kind,
+                sourceText: note.sourceText,
+                noteText: note.noteText,
+                eventTime: note.eventTime,
+                chapterTitle: note.chapterTitle,
+                location: note.location,
+                sourceOrder: index
+            )
+        }
+    }
+
+    private static func timestamp(from payload: [String: Any], keys: [String]) -> Date? {
+        for key in keys {
+            if let raw = payload[key] {
+                if let int = raw as? Int, int > 0 {
+                    let sec = int > 1_000_000_000_000 ? Double(int) / 1000.0 : Double(int)
+                    return Date(timeIntervalSince1970: sec)
+                }
+                if let str = raw as? String, let int = Int(str), int > 0 {
+                    let sec = int > 1_000_000_000_000 ? Double(int) / 1000.0 : Double(int)
+                    return Date(timeIntervalSince1970: sec)
+                }
+            }
+        }
+        return nil
+    }
+
+    private static func int(from payload: [String: Any], keys: [String]) -> Int? {
+        for key in keys {
+            if let value = payload[key] as? Int { return value }
+            if let value = payload[key] as? String, let parsed = Int(value) { return parsed }
+        }
+        return nil
     }
 }
