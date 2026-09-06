@@ -537,9 +537,10 @@ struct BookThumbCard: View {
     let openNotebook: (LibraryBook) -> Void
 
     var body: some View {
-        Button {
+        VStack(alignment: .leading, spacing: 6) {
+            Button {
             openBook(book)
-        } label: {
+            } label: {
             VStack(alignment: .leading, spacing: 6) {
             // 封面占位 (异步加载)
             AsyncImage(url: URL(string: book.cover)) { phase in
@@ -573,12 +574,16 @@ struct BookThumbCard: View {
                     .foregroundStyle(Theme.success)
             }
             }
-            .frame(width: 72)
+            .frame(width: 72, alignment: .leading)
+            }
+            .buttonStyle(.plain)
+            Button("Notebook") {
+            openNotebook(book)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.mini)
         }
-        .buttonStyle(.plain)
-        .contextMenu {
-            Button("在 Notebook 打开") { openNotebook(book) }
-        }
+        .frame(width: 72)
     }
 }
 

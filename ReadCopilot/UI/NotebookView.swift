@@ -100,9 +100,7 @@ struct NotebookView: View {
             }
         }
         .onChange(of: selectedBookID) { _, newValue in
-            if !newValue.isEmpty {
-                model.selectedBookID = newValue
-            }
+            model.selectedBookID = newValue
         }
     }
 
