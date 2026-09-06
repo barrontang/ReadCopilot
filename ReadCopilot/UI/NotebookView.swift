@@ -138,7 +138,7 @@ struct NotebookView: View {
                 }
                 Spacer()
                 Button {
-                    guard let selected = books.first(where: { $0.id == model.selectedBookID }) else { return }
+                    guard let selected = books.first(where: { $0.id == model.selectedBookID && !$0.isAlbum }) else { return }
                     Task { await model.sync(book: selected) }
                 } label: {
                     if model.loading {

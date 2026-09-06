@@ -15,7 +15,7 @@ struct NotebookEntry: Identifiable, Hashable {
     }
 
     var dayKey: String {
-        DateFormatter.notebookDay.string(from: timelineDate)
+        timelineDate.formatted(.dateTime.year().month().day())
     }
 
     var orderHint: String {
@@ -58,7 +58,7 @@ enum NotebookComposer {
                     id: note.id,
                     note: note,
                     timelineDate: note.syncedAt,
-                    readingOrderKey: normalizedOrderKey(baseDate: note.syncedAt, fallback: Int64(location)),
+                    readingOrderKey: Int64(location),
                     orderSource: .location
                 )
             }
@@ -67,7 +67,7 @@ enum NotebookComposer {
                     id: note.id,
                     note: note,
                     timelineDate: note.syncedAt,
-                    readingOrderKey: normalizedOrderKey(baseDate: note.syncedAt, fallback: Int64(sourceOrder)),
+                    readingOrderKey: Int64(sourceOrder),
                     orderSource: .sourceOrder
                 )
             }
@@ -83,11 +83,11 @@ enum NotebookComposer {
             if lhs.readingOrderKey != rhs.readingOrderKey {
                 return lhs.readingOrderKey < rhs.readingOrderKey
             }
-            if lhs.timelineDate != rhs.timelineDate {
-                return lhs.timelineDate < rhs.timelineDate
-            }
             if lhs.orderSource != rhs.orderSource {
                 return sourcePriority(lhs.orderSource) < sourcePriority(rhs.orderSource)
+            }
+            if lhs.timelineDate != rhs.timelineDate {
+                return lhs.timelineDate < rhs.timelineDate
             }
             return lhs.id < rhs.id
         }
@@ -116,13 +116,4 @@ enum NotebookComposer {
 
 private extension String {
     var nilIfEmpty: String? { isEmpty ? nil : self }
-}
-
-private extension DateFormatter {
-    static let notebookDay: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.calendar = .current
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter
-    }()
 }
