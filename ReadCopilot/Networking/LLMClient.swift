@@ -45,7 +45,11 @@ struct LLMClient {
         let isLoopbackIPv4 = normalizedHost.hasPrefix("127.")
         let isLoopbackIPv6 = normalizedHost == "::1" || normalizedHost == "0:0:0:0:0:0:0:1"
         let isLocal = normalizedHost == "localhost" || isLoopbackIPv4 || isLoopbackIPv6
-        if rawURL.scheme?.lowercased() != "https" && !isLocal {
+        let scheme = rawURL.scheme?.lowercased() ?? ""
+        guard scheme == "http" || scheme == "https" else {
+            throw LLMError.badURL
+        }
+        if scheme != "https" && !isLocal {
             throw LLMError.insecureBaseURL
         }
         guard let url = URL(string: base + "/chat/completions") else { throw LLMError.badURL }

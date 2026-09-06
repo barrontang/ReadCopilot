@@ -47,7 +47,7 @@ final class NotebookModelsTests: XCTestCase {
         ]
 
         let entries = NotebookComposer.compose(notes: notes)
-        XCTAssertEqual(entries.map(\.id), ["event", "location", "source-order", "synced"])
+        XCTAssertEqual(entries.map(\.id), ["synced", "event", "location", "source-order"])
         XCTAssertEqual(entries.first(where: { $0.id == "event" })?.orderSource, .eventTime)
         XCTAssertEqual(entries.first(where: { $0.id == "location" })?.orderSource, .location)
         XCTAssertEqual(entries.first(where: { $0.id == "source-order" })?.orderSource, .sourceOrder)
@@ -62,7 +62,6 @@ final class NotebookModelsTests: XCTestCase {
                 id: "a",
                 note: ReadingNote(id: "a", bookID: "b", bookTitle: "书", kind: .highlight, sourceText: "1", noteText: "", eventTime: day1),
                 timelineDate: day1,
-                orderRank: 0,
                 orderValue: Int64(day1.timeIntervalSince1970),
                 orderSource: .eventTime
             ),
@@ -70,7 +69,6 @@ final class NotebookModelsTests: XCTestCase {
                 id: "b",
                 note: ReadingNote(id: "b", bookID: "b", bookTitle: "书", kind: .highlight, sourceText: "2", noteText: "", eventTime: day2),
                 timelineDate: day2,
-                orderRank: 0,
                 orderValue: Int64(day2.timeIntervalSince1970),
                 orderSource: .eventTime
             )
@@ -123,5 +121,31 @@ final class NotebookModelsTests: XCTestCase {
         XCTAssertNotNil(notes[0].eventTime)
         XCTAssertEqual(notes[0].sourceOrder, 0)
         XCTAssertEqual(notes[1].sourceOrder, 1)
+    }
+
+    func testPersistentReadingNoteRoundTripKeepsTraceability() {
+        let now = Date(timeIntervalSince1970: 1_750_000_000)
+        let note = ReadingNote(
+            id: "trace-1",
+            bookID: "book-1",
+            bookTitle: "测试书",
+            kind: .thought,
+            sourceText: "原文",
+            noteText: "想法",
+            eventTime: now,
+            chapterTitle: "第三章",
+            location: 42,
+            sourceOrder: 7,
+            syncedAt: now.addingTimeInterval(60)
+        )
+        let persisted = PersistentReadingNote(from: note)
+        let restored = persisted.toReadingNote()
+
+        XCTAssertEqual(restored.id, note.id)
+        XCTAssertEqual(restored.eventTime, note.eventTime)
+        XCTAssertEqual(restored.chapterTitle, note.chapterTitle)
+        XCTAssertEqual(restored.location, note.location)
+        XCTAssertEqual(restored.sourceOrder, note.sourceOrder)
+        XCTAssertEqual(restored.syncedAt, note.syncedAt)
     }
 }

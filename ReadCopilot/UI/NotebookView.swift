@@ -129,7 +129,12 @@ struct NotebookView: View {
                     }
                     .labelsHidden()
                     .onChange(of: model.selectedBookID) { _, newValue in
-                        selectedBookID = newValue
+                        if selectedBookID != newValue {
+                            selectedBookID = newValue
+                        }
+                        model.selectedCategory = ""
+                        model.useDateRange = false
+                        model.reload()
                     }
                 }
                 VStack(alignment: .leading, spacing: 4) {

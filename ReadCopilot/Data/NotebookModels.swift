@@ -4,7 +4,6 @@ struct NotebookEntry: Identifiable, Hashable {
     let id: String
     let note: ReadingNote
     let timelineDate: Date
-    let orderRank: Int
     let orderValue: Int64
     let orderSource: OrderSource
 
@@ -47,7 +46,6 @@ enum NotebookComposer {
                     id: note.id,
                     note: note,
                     timelineDate: eventTime,
-                    orderRank: 0,
                     orderValue: baseDateOrderKey(eventTime),
                     orderSource: .eventTime
                 )
@@ -57,7 +55,6 @@ enum NotebookComposer {
                     id: note.id,
                     note: note,
                     timelineDate: timelineDate,
-                    orderRank: 1,
                     orderValue: Int64(location),
                     orderSource: .location
                 )
@@ -67,7 +64,6 @@ enum NotebookComposer {
                     id: note.id,
                     note: note,
                     timelineDate: timelineDate,
-                    orderRank: 2,
                     orderValue: Int64(sourceOrder),
                     orderSource: .sourceOrder
                 )
@@ -76,16 +72,12 @@ enum NotebookComposer {
                 id: note.id,
                 note: note,
                 timelineDate: note.syncedAt,
-                orderRank: 3,
                 orderValue: baseDateOrderKey(note.syncedAt),
                 orderSource: .syncedAt
             )
         }
         .sorted { lhs, rhs in
-            if lhs.orderRank != rhs.orderRank {
-                return lhs.orderRank < rhs.orderRank
-            }
-            if lhs.orderValue != rhs.orderValue {
+            if lhs.orderSource == rhs.orderSource, lhs.orderValue != rhs.orderValue {
                 return lhs.orderValue < rhs.orderValue
             }
             if lhs.timelineDate != rhs.timelineDate {
