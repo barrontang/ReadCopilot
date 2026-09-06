@@ -63,7 +63,7 @@ enum NotebookComposer {
                     id: note.id,
                     note: note,
                     timelineDate: note.syncedAt,
-                    readingOrderKey: normalizedOrderKey(baseDate: note.syncedAt, fallback: Int64(sourceOrder)),
+                    readingOrderKey: Int64(sourceOrder),
                     orderSource: .sourceOrder
                 )
             }

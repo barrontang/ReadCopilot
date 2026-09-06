@@ -58,7 +58,6 @@ final class NotebookViewModel: ObservableObject {
 
 struct NotebookView: View {
     let books: [LibraryBook]
-    let libraryLastSyncedAt: Date?
     @Binding var selectedBookID: String
     let openCopilot: (String) -> Void
     @StateObject private var model = NotebookViewModel()
@@ -102,12 +101,6 @@ struct NotebookView: View {
             model.selectedBookID = selectedBookID
             model.reload()
         }
-        .onChange(of: books.map(\.id).joined(separator: ",")) { _, _ in
-            model.reload()
-        }
-        .onChange(of: libraryLastSyncedAt) { _, _ in
-            model.reload()
-        }
         .onChange(of: selectedBookID) { _, newValue in
             model.selectedBookID = newValue
         }
@@ -120,18 +113,26 @@ struct NotebookView: View {
             }
             .pickerStyle(.segmented)
             HStack {
-                Picker("图书", selection: $model.selectedBookID) {
-                    Text("全部图书").tag("")
-                    ForEach(books.filter { !$0.isAlbum }) { book in
-                        Text(book.title).tag(book.id)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("图书筛选").font(Theme.body(11)).foregroundStyle(Theme.inkSecondary)
+                    Picker("图书", selection: $model.selectedBookID) {
+                        Text("全部图书").tag("")
+                        ForEach(books.filter { !$0.isAlbum }) { book in
+                            Text(book.title).tag(book.id)
+                        }
+                    }
+                    .labelsHidden()
+                    .onChange(of: model.selectedBookID) { _, newValue in
+                        selectedBookID = newValue
                     }
                 }
-                .onChange(of: model.selectedBookID) { _, newValue in
-                    selectedBookID = newValue
-                }
-                Picker("类别", selection: $model.selectedCategory) {
-                    Text("全部类别").tag("")
-                    ForEach(categories, id: \.self) { Text($0).tag($0) }
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("类别筛选").font(Theme.body(11)).foregroundStyle(Theme.inkSecondary)
+                    Picker("类别", selection: $model.selectedCategory) {
+                        Text("全部类别").tag("")
+                        ForEach(categories, id: \.self) { Text($0).tag($0) }
+                    }
+                    .labelsHidden()
                 }
             }
             HStack {

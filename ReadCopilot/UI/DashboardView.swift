@@ -509,6 +509,8 @@ struct CategoryChart: View {
                             .accessibilityHint("打开该类别的阅读明细")
                         }
                     }
+                    .accessibilityLabel("类别筛选列表")
+                    .accessibilityHint("可左右滑动查看更多类别按钮")
                 }
             }
         }
