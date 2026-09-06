@@ -2,7 +2,7 @@ import SwiftUI
 
 enum Nav: String, CaseIterable, Identifiable {
     case home      = "阅读主页"
-    case notebook  = "Notebook"
+    case notebook  = "笔记本"
     case copilot   = "Copilot"
     case knowledge = "知识库"
     case settings  = "设置"

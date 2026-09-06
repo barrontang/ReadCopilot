@@ -76,9 +76,6 @@ enum NotebookComposer {
             )
         }
         .sorted { lhs, rhs in
-            if sourcePriority(lhs.orderSource) != sourcePriority(rhs.orderSource) {
-                return sourcePriority(lhs.orderSource) < sourcePriority(rhs.orderSource)
-            }
             if lhs.readingOrderKey != rhs.readingOrderKey {
                 return lhs.readingOrderKey < rhs.readingOrderKey
             }
@@ -103,15 +100,6 @@ enum NotebookComposer {
             }
             .sorted { $0.sortDay > $1.sortDay }
             .map { (day: $0.day, entries: $0.entries) }
-    }
-
-    private static func sourcePriority(_ source: NotebookEntry.OrderSource) -> Int {
-        switch source {
-        case .eventTime: return 0
-        case .location: return 1
-        case .sourceOrder: return 2
-        case .syncedAt: return 3
-        }
     }
 
     private static func normalizedOrderKey(baseDate: Date, fallback: Int64 = 0) -> Int64 {

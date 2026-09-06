@@ -77,7 +77,7 @@ struct NotebookView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Notebook")
+                Text("阅读笔记本")
                     .font(Theme.serifTitle(22))
                 controls
                 if let message = model.message {
@@ -96,7 +96,7 @@ struct NotebookView: View {
             .padding(24)
         }
         .background(Theme.bg)
-        .navigationTitle("Notebook")
+        .navigationTitle("笔记本")
         .onAppear {
             model.selectedBookID = selectedBookID
             model.reload()
