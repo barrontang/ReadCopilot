@@ -42,7 +42,7 @@ struct RootView: View {
             .tabItem { Label(Nav.home.rawValue, systemImage: Nav.home.icon) }
             .tag(Nav.home)
 
-            NotebookView(books: store.books, selectedBookID: $selectedBookID) { bookID in
+            NotebookView(books: store.books, libraryLastSyncedAt: store.lastSyncedAt, selectedBookID: $selectedBookID) { bookID in
                 selectedBookID = bookID
                 nav = .copilot
             }
@@ -86,7 +86,7 @@ struct RootView: View {
                     nav = .notebook
                 }
             case .notebook:
-                NotebookView(books: store.books, selectedBookID: $selectedBookID) { bookID in
+                NotebookView(books: store.books, libraryLastSyncedAt: store.lastSyncedAt, selectedBookID: $selectedBookID) { bookID in
                     selectedBookID = bookID
                     nav = .copilot
                 }

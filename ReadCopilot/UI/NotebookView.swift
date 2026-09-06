@@ -58,6 +58,7 @@ final class NotebookViewModel: ObservableObject {
 
 struct NotebookView: View {
     let books: [LibraryBook]
+    let libraryLastSyncedAt: Date?
     @Binding var selectedBookID: String
     let openCopilot: (String) -> Void
     @StateObject private var model = NotebookViewModel()
@@ -102,6 +103,9 @@ struct NotebookView: View {
             model.reload()
         }
         .onChange(of: books.map(\.id).joined(separator: ",")) { _, _ in
+            model.reload()
+        }
+        .onChange(of: libraryLastSyncedAt) { _, _ in
             model.reload()
         }
         .onChange(of: selectedBookID) { _, newValue in

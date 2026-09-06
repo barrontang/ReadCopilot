@@ -642,7 +642,7 @@ private struct DashboardDrilldownView: View {
         case .books:
             return "这里将承载书籍维度明细和筛选。"
         case .category:
-            return "这里将承载类别分布和类别内图书明细。"
+            return "当前选择类别：\(target.title)。这里将承载该类别内图书明细与趋势。"
         }
     }
 }
