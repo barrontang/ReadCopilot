@@ -49,8 +49,7 @@ final class NotebookViewModel: ObservableObject {
             if useDateRange {
                 let start = Calendar.current.startOfDay(for: fromDate)
                 let end = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: toDate) ?? toDate
-                let temporalDate = entry.note.eventTime ?? entry.note.syncedAt
-                if temporalDate < start || temporalDate > end { return false }
+                if entry.timelineDate < start || entry.timelineDate > end { return false }
             }
             return true
         }
