@@ -108,6 +108,7 @@ struct NotebookView: View {
             model.selectedBookID = newValue
             model.selectedCategory = ""
             model.useDateRange = false
+            model.reload()
         }
     }
 

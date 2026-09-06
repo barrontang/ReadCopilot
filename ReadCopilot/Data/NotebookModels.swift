@@ -4,7 +4,8 @@ struct NotebookEntry: Identifiable, Hashable {
     let id: String
     let note: ReadingNote
     let timelineDate: Date
-    let readingOrderKey: Int64
+    let orderRank: Int
+    let orderValue: Int64
     let orderSource: OrderSource
 
     enum OrderSource: String, Hashable {
@@ -46,7 +47,8 @@ enum NotebookComposer {
                     id: note.id,
                     note: note,
                     timelineDate: eventTime,
-                    readingOrderKey: prioritizedOrderKey(priority: 0, value: baseDateOrderKey(eventTime)),
+                    orderRank: 0,
+                    orderValue: baseDateOrderKey(eventTime),
                     orderSource: .eventTime
                 )
             }
@@ -55,7 +57,8 @@ enum NotebookComposer {
                     id: note.id,
                     note: note,
                     timelineDate: timelineDate,
-                    readingOrderKey: prioritizedOrderKey(priority: 1, value: Int64(location)),
+                    orderRank: 1,
+                    orderValue: Int64(location),
                     orderSource: .location
                 )
             }
@@ -64,7 +67,8 @@ enum NotebookComposer {
                     id: note.id,
                     note: note,
                     timelineDate: timelineDate,
-                    readingOrderKey: prioritizedOrderKey(priority: 2, value: Int64(sourceOrder)),
+                    orderRank: 2,
+                    orderValue: Int64(sourceOrder),
                     orderSource: .sourceOrder
                 )
             }
@@ -72,13 +76,17 @@ enum NotebookComposer {
                 id: note.id,
                 note: note,
                 timelineDate: note.syncedAt,
-                readingOrderKey: prioritizedOrderKey(priority: 3, value: baseDateOrderKey(note.syncedAt)),
+                orderRank: 3,
+                orderValue: baseDateOrderKey(note.syncedAt),
                 orderSource: .syncedAt
             )
         }
         .sorted { lhs, rhs in
-            if lhs.readingOrderKey != rhs.readingOrderKey {
-                return lhs.readingOrderKey < rhs.readingOrderKey
+            if lhs.orderRank != rhs.orderRank {
+                return lhs.orderRank < rhs.orderRank
+            }
+            if lhs.orderValue != rhs.orderValue {
+                return lhs.orderValue < rhs.orderValue
             }
             if lhs.timelineDate != rhs.timelineDate {
                 return lhs.timelineDate < rhs.timelineDate
@@ -107,9 +115,6 @@ enum NotebookComposer {
         Int64(date.timeIntervalSince1970 * 1000)
     }
 
-    private static func prioritizedOrderKey(priority: Int64, value: Int64) -> Int64 {
-        priority * 1_000_000_000_000_000 + max(value, 0)
-    }
 }
 
 private extension String {

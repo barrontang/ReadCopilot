@@ -62,14 +62,16 @@ final class NotebookModelsTests: XCTestCase {
                 id: "a",
                 note: ReadingNote(id: "a", bookID: "b", bookTitle: "书", kind: .highlight, sourceText: "1", noteText: "", eventTime: day1),
                 timelineDate: day1,
-                readingOrderKey: Int64(day1.timeIntervalSince1970),
+                orderRank: 0,
+                orderValue: Int64(day1.timeIntervalSince1970),
                 orderSource: .eventTime
             ),
             NotebookEntry(
                 id: "b",
                 note: ReadingNote(id: "b", bookID: "b", bookTitle: "书", kind: .highlight, sourceText: "2", noteText: "", eventTime: day2),
                 timelineDate: day2,
-                readingOrderKey: Int64(day2.timeIntervalSince1970),
+                orderRank: 0,
+                orderValue: Int64(day2.timeIntervalSince1970),
                 orderSource: .eventTime
             )
         ]

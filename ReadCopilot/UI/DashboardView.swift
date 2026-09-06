@@ -495,7 +495,7 @@ struct CategoryChart: View {
                         ForEach(data) { item in
                             let categoryName = item.category.isEmpty ? "未分类" : item.category
                             Button {
-                                onSelect(item.category)
+                                onSelect(categoryName)
                             } label: {
                                 HStack(spacing: 4) {
                                     Text(categoryName)
