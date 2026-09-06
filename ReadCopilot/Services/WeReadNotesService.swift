@@ -88,7 +88,16 @@ struct WeReadNotesService {
             )
         }
         let merged = highlights + thoughts
-        return merged.enumerated().map { index, note in
+        let ordered = merged.enumerated().sorted { lhs, rhs in
+            let lTime = lhs.element.eventTime ?? lhs.element.syncedAt
+            let rTime = rhs.element.eventTime ?? rhs.element.syncedAt
+            if lTime != rTime { return lTime < rTime }
+            if let lLoc = lhs.element.location, let rLoc = rhs.element.location, lLoc != rLoc {
+                return lLoc < rLoc
+            }
+            return lhs.offset < rhs.offset
+        }.map(\.element)
+        return ordered.enumerated().map { index, note in
             ReadingNote(
                 id: note.id,
                 bookID: note.bookID,

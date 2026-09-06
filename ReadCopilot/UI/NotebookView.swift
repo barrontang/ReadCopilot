@@ -38,6 +38,10 @@ final class NotebookViewModel: ObservableObject {
 
     func filteredEntries(books: [LibraryBook]) -> [NotebookEntry] {
         let bookMap = Dictionary(uniqueKeysWithValues: books.map { ($0.id, $0) })
+        let start = useDateRange ? Calendar.current.startOfDay(for: fromDate) : nil
+        let end = useDateRange
+            ? (Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: toDate) ?? toDate)
+            : nil
         return allEntries.filter { entry in
             if !selectedBookID.isEmpty && entry.note.bookID != selectedBookID {
                 return false
@@ -46,10 +50,8 @@ final class NotebookViewModel: ObservableObject {
                 let category = bookMap[entry.note.bookID]?.category ?? ""
                 if category != selectedCategory { return false }
             }
-            if useDateRange {
-                let start = Calendar.current.startOfDay(for: fromDate)
-                let end = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: toDate) ?? toDate
-                if entry.timelineDate < start || entry.timelineDate > end { return false }
+            if let start, let end, (entry.timelineDate < start || entry.timelineDate > end) {
+                return false
             }
             return true
         }
@@ -139,7 +141,7 @@ struct NotebookView: View {
                 Toggle("日期范围", isOn: $model.useDateRange)
                 if model.useDateRange {
                     GroupBox("筛选日期") {
-                        HStack {
+                        VStack(alignment: .leading, spacing: 8) {
                             DatePicker("开始日期", selection: $model.fromDate, displayedComponents: .date)
                             DatePicker("结束日期", selection: $model.toDate, displayedComponents: .date)
                         }

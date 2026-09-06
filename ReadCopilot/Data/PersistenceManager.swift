@@ -155,7 +155,11 @@ struct PersistenceManager {
         let context = ModelContext(Self.modelContainer)
         let descriptor = FetchDescriptor<PersistentReadingNote>(
             predicate: #Predicate { $0.bookID == bookID },
-            sortBy: [SortDescriptor(\.syncedAt, order: .reverse)]
+            sortBy: [
+                SortDescriptor(\.syncedAt, order: .reverse),
+                SortDescriptor(\.eventTime, order: .reverse),
+                SortDescriptor(\.sourceOrder)
+            ]
         )
         let persistentNotes = try context.fetch(descriptor)
         return persistentNotes.map { $0.toReadingNote() }
@@ -165,7 +169,11 @@ struct PersistenceManager {
     func fetchAllNotes() throws -> [ReadingNote] {
         let context = ModelContext(Self.modelContainer)
         let descriptor = FetchDescriptor<PersistentReadingNote>(
-            sortBy: [SortDescriptor(\.syncedAt, order: .reverse)]
+            sortBy: [
+                SortDescriptor(\.syncedAt, order: .reverse),
+                SortDescriptor(\.eventTime, order: .reverse),
+                SortDescriptor(\.sourceOrder)
+            ]
         )
         return try context.fetch(descriptor).map { $0.toReadingNote() }
     }
