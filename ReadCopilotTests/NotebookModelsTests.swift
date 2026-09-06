@@ -47,7 +47,7 @@ final class NotebookModelsTests: XCTestCase {
         ]
 
         let entries = NotebookComposer.compose(notes: notes)
-        XCTAssertEqual(entries.map(\.id), ["synced", "source-order", "location", "event"])
+        XCTAssertEqual(entries.map(\.id), ["event", "location", "source-order", "synced"])
         XCTAssertEqual(entries.first(where: { $0.id == "event" })?.orderSource, .eventTime)
         XCTAssertEqual(entries.first(where: { $0.id == "location" })?.orderSource, .location)
         XCTAssertEqual(entries.first(where: { $0.id == "source-order" })?.orderSource, .sourceOrder)
@@ -61,13 +61,15 @@ final class NotebookModelsTests: XCTestCase {
             NotebookEntry(
                 id: "a",
                 note: ReadingNote(id: "a", bookID: "b", bookTitle: "书", kind: .highlight, sourceText: "1", noteText: "", eventTime: day1),
-                orderDate: day1,
+                timelineDate: day1,
+                orderValue: Int64(day1.timeIntervalSince1970),
                 orderSource: .eventTime
             ),
             NotebookEntry(
                 id: "b",
                 note: ReadingNote(id: "b", bookID: "b", bookTitle: "书", kind: .highlight, sourceText: "2", noteText: "", eventTime: day2),
-                orderDate: day2,
+                timelineDate: day2,
+                orderValue: Int64(day2.timeIntervalSince1970),
                 orderSource: .eventTime
             )
         ]

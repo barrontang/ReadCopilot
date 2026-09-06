@@ -49,7 +49,8 @@ final class NotebookViewModel: ObservableObject {
             if useDateRange {
                 let start = Calendar.current.startOfDay(for: fromDate)
                 let end = Calendar.current.date(bySettingHour: 23, minute: 59, second: 59, of: toDate) ?? toDate
-                if entry.orderDate < start || entry.orderDate > end { return false }
+                let temporalDate = entry.note.eventTime ?? entry.note.syncedAt
+                if temporalDate < start || temporalDate > end { return false }
             }
             return true
         }
@@ -58,6 +59,7 @@ final class NotebookViewModel: ObservableObject {
 
 struct NotebookView: View {
     let books: [LibraryBook]
+    @Binding var selectedBookID: String
     let openCopilot: (String) -> Void
     @StateObject private var model = NotebookViewModel()
 
@@ -92,7 +94,17 @@ struct NotebookView: View {
         }
         .background(Theme.bg)
         .navigationTitle("Notebook")
-        .task { model.reload() }
+        .task {
+            model.reload()
+            if model.selectedBookID.isEmpty, !selectedBookID.isEmpty {
+                model.selectedBookID = selectedBookID
+            }
+        }
+        .onChange(of: selectedBookID) { _, newValue in
+            if !newValue.isEmpty {
+                model.selectedBookID = newValue
+            }
+        }
     }
 
     private var controls: some View {
@@ -183,7 +195,7 @@ private struct NotebookEntryRow: View {
                     .font(Theme.body(11))
                     .foregroundStyle(Theme.inkSecondary)
                 Spacer()
-                Text(entry.orderDate.formatted(date: .abbreviated, time: .shortened))
+                Text(entry.timelineDate.formatted(date: .abbreviated, time: .shortened))
                     .font(Theme.body(11))
                     .foregroundStyle(Theme.inkSecondary)
             }

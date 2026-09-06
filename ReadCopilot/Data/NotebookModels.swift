@@ -3,7 +3,8 @@ import Foundation
 struct NotebookEntry: Identifiable, Hashable {
     let id: String
     let note: ReadingNote
-    let orderDate: Date
+    let timelineDate: Date
+    let orderValue: Int64
     let orderSource: OrderSource
 
     enum OrderSource: String, Hashable {
@@ -14,7 +15,7 @@ struct NotebookEntry: Identifiable, Hashable {
     }
 
     var dayKey: String {
-        DateFormatter.notebookDay.string(from: orderDate)
+        DateFormatter.notebookDay.string(from: timelineDate)
     }
 
     var orderHint: String {
@@ -44,21 +45,46 @@ enum NotebookComposer {
     static func compose(notes: [ReadingNote]) -> [NotebookEntry] {
         notes.map { note in
             if let eventTime = note.eventTime {
-                return NotebookEntry(id: note.id, note: note, orderDate: eventTime, orderSource: .eventTime)
+                return NotebookEntry(
+                    id: note.id,
+                    note: note,
+                    timelineDate: eventTime,
+                    orderValue: Int64(eventTime.timeIntervalSince1970 * 1000),
+                    orderSource: .eventTime
+                )
             }
             if let location = note.location {
-                let pseudo = Date(timeIntervalSince1970: TimeInterval(max(location, 0)))
-                return NotebookEntry(id: note.id, note: note, orderDate: pseudo, orderSource: .location)
+                return NotebookEntry(
+                    id: note.id,
+                    note: note,
+                    timelineDate: note.syncedAt,
+                    orderValue: Int64(location),
+                    orderSource: .location
+                )
             }
             if let sourceOrder = note.sourceOrder {
-                let pseudo = Date(timeIntervalSince1970: TimeInterval(max(sourceOrder, 0)))
-                return NotebookEntry(id: note.id, note: note, orderDate: pseudo, orderSource: .sourceOrder)
+                return NotebookEntry(
+                    id: note.id,
+                    note: note,
+                    timelineDate: note.syncedAt,
+                    orderValue: Int64(sourceOrder),
+                    orderSource: .sourceOrder
+                )
             }
-            return NotebookEntry(id: note.id, note: note, orderDate: note.syncedAt, orderSource: .syncedAt)
+            return NotebookEntry(
+                id: note.id,
+                note: note,
+                timelineDate: note.syncedAt,
+                orderValue: Int64(note.syncedAt.timeIntervalSince1970 * 1000),
+                orderSource: .syncedAt
+            )
         }
         .sorted { lhs, rhs in
-            if lhs.orderDate != rhs.orderDate {
-                return lhs.orderDate < rhs.orderDate
+            if lhs.orderSource != rhs.orderSource {
+                return sourcePriority(lhs.orderSource) < sourcePriority(rhs.orderSource)
+            }
+            if lhs.orderValue != rhs.orderValue {
+                return lhs.orderValue < rhs.orderValue
             }
             return lhs.id < rhs.id
         }
@@ -66,8 +92,17 @@ enum NotebookComposer {
 
     static func groupByDay(entries: [NotebookEntry]) -> [(day: String, entries: [NotebookEntry])] {
         Dictionary(grouping: entries, by: \.dayKey)
-            .map { ($0.key, $0.value.sorted { $0.orderDate < $1.orderDate }) }
+            .map { ($0.key, $0.value.sorted { $0.timelineDate < $1.timelineDate }) }
             .sorted { $0.day > $1.day }
+    }
+
+    private static func sourcePriority(_ source: NotebookEntry.OrderSource) -> Int {
+        switch source {
+        case .eventTime: return 0
+        case .location: return 1
+        case .sourceOrder: return 2
+        case .syncedAt: return 3
+        }
     }
 }
 
