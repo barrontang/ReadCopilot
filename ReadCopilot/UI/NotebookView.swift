@@ -105,6 +105,8 @@ struct NotebookView: View {
         }
         .onChange(of: selectedBookID) { _, newValue in
             model.selectedBookID = newValue
+            model.selectedCategory = ""
+            model.useDateRange = false
         }
     }
 

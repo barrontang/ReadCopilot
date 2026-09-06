@@ -40,20 +40,11 @@ enum NotebookBookFilter: String, CaseIterable, Identifiable {
 enum NotebookComposer {
     static func compose(notes: [ReadingNote]) -> [NotebookEntry] {
         notes.map { note in
-            if let eventTime = note.eventTime {
-                return NotebookEntry(
-                    id: note.id,
-                    note: note,
-                    timelineDate: eventTime,
-                    readingOrderKey: normalizedOrderKey(baseDate: eventTime),
-                    orderSource: .eventTime
-                )
-            }
             if let location = note.location {
                 return NotebookEntry(
                     id: note.id,
                     note: note,
-                    timelineDate: note.syncedAt,
+                    timelineDate: note.eventTime ?? note.syncedAt,
                     readingOrderKey: Int64(location),
                     orderSource: .location
                 )
@@ -65,6 +56,15 @@ enum NotebookComposer {
                     timelineDate: note.syncedAt,
                     readingOrderKey: Int64(sourceOrder),
                     orderSource: .sourceOrder
+                )
+            }
+            if let eventTime = note.eventTime {
+                return NotebookEntry(
+                    id: note.id,
+                    note: note,
+                    timelineDate: eventTime,
+                    readingOrderKey: normalizedOrderKey(baseDate: eventTime),
+                    orderSource: .eventTime
                 )
             }
             return NotebookEntry(
