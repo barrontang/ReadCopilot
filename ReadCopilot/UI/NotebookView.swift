@@ -70,6 +70,10 @@ struct NotebookView: View {
         model.filteredEntries(books: books)
     }
 
+    private var selectedSyncBook: LibraryBook? {
+        books.first(where: { $0.id == model.selectedBookID && !$0.isAlbum })
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
@@ -94,10 +98,8 @@ struct NotebookView: View {
         .background(Theme.bg)
         .navigationTitle("Notebook")
         .task {
+            model.selectedBookID = selectedBookID
             model.reload()
-            if model.selectedBookID.isEmpty, !selectedBookID.isEmpty {
-                model.selectedBookID = selectedBookID
-            }
         }
         .onChange(of: selectedBookID) { _, newValue in
             model.selectedBookID = newValue
@@ -138,7 +140,7 @@ struct NotebookView: View {
                 }
                 Spacer()
                 Button {
-                    guard let selected = books.first(where: { $0.id == model.selectedBookID && !$0.isAlbum }) else { return }
+                    guard let selected = selectedSyncBook else { return }
                     Task { await model.sync(book: selected) }
                 } label: {
                     if model.loading {
@@ -147,7 +149,7 @@ struct NotebookView: View {
                         Label("同步当前图书笔记", systemImage: "arrow.clockwise")
                     }
                 }
-                .disabled(model.selectedBookID.isEmpty || model.loading)
+                .disabled(selectedSyncBook == nil || model.loading)
             }
             .font(Theme.body(12))
         }

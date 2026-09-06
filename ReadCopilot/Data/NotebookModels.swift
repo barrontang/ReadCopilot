@@ -14,10 +14,6 @@ struct NotebookEntry: Identifiable, Hashable {
         case syncedAt = "同步时间"
     }
 
-    var dayKey: String {
-        timelineDate.formatted(.dateTime.year().month().day())
-    }
-
     var orderHint: String {
         if let chapter = note.chapterTitle.nilIfEmpty {
             return chapter
@@ -94,9 +90,19 @@ enum NotebookComposer {
     }
 
     static func groupByDay(entries: [NotebookEntry]) -> [(day: String, entries: [NotebookEntry])] {
-        Dictionary(grouping: entries, by: \.dayKey)
-            .map { ($0.key, $0.value.sorted { $0.timelineDate < $1.timelineDate }) }
-            .sorted { $0.day > $1.day }
+        let calendar = Calendar.current
+        return Dictionary(grouping: entries) { entry in
+            calendar.startOfDay(for: entry.timelineDate)
+        }
+            .map { day, items in
+                (
+                    day: day.formatted(.dateTime.year().month().day()),
+                    sortDay: day,
+                    entries: items.sorted { $0.timelineDate < $1.timelineDate }
+                )
+            }
+            .sorted { $0.sortDay > $1.sortDay }
+            .map { (day: $0.day, entries: $0.entries) }
     }
 
     private static func sourcePriority(_ source: NotebookEntry.OrderSource) -> Int {

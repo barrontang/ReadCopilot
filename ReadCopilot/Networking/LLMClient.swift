@@ -40,8 +40,11 @@ struct LLMClient {
         var base = baseURL.trimmingCharacters(in: .whitespacesAndNewlines)
         if base.hasSuffix("/") { base.removeLast() }
         guard let rawURL = URL(string: base) else { throw LLMError.badURL }
-        let host = rawURL.host?.lowercased()
-        let isLocal = host == "localhost" || host == "127.0.0.1" || host == "::1"
+        let host = rawURL.host?.lowercased() ?? ""
+        let normalizedHost = host.trimmingCharacters(in: CharacterSet(charactersIn: "[]"))
+        let isLoopbackIPv4 = normalizedHost.hasPrefix("127.")
+        let isLoopbackIPv6 = normalizedHost == "::1" || normalizedHost == "0:0:0:0:0:0:0:1"
+        let isLocal = normalizedHost == "localhost" || isLoopbackIPv4 || isLoopbackIPv6
         if rawURL.scheme?.lowercased() != "https" && !isLocal {
             throw LLMError.insecureBaseURL
         }
