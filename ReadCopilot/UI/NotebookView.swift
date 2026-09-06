@@ -117,6 +117,9 @@ struct NotebookView: View {
                         Text(book.title).tag(book.id)
                     }
                 }
+                .onChange(of: model.selectedBookID) { _, newValue in
+                    selectedBookID = newValue
+                }
                 Picker("类别", selection: $model.selectedCategory) {
                     Text("全部类别").tag("")
                     ForEach(categories, id: \.self) { Text($0).tag($0) }

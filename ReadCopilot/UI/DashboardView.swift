@@ -577,11 +577,15 @@ struct BookThumbCard: View {
             .frame(width: 72, alignment: .leading)
             }
             .buttonStyle(.plain)
-            Button("Notebook") {
+            .accessibilityLabel("在 Copilot 打开《\(book.title)》")
+            .accessibilityHint("进入该书的分析工作台")
+            Button("打开笔记本") {
             openNotebook(book)
             }
             .buttonStyle(.bordered)
             .controlSize(.mini)
+            .accessibilityLabel("在 Notebook 打开《\(book.title)》")
+            .accessibilityHint("进入该书的阅读笔记列表")
         }
         .frame(width: 72)
     }
