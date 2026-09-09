@@ -1,7 +1,7 @@
 # ReadCopilot
 
 <p align="center">
-  <strong>把微信读书划线与想法，整理成私有、可检索、可追溯的 AI 阅读工作台。</strong>
+  <strong>面向微信读书（WeRead / WeChat Read）的原生 macOS/iOS AI 阅读工作台：把划线、想法与知识沉淀为可长期复用的资产。</strong>
 </p>
 
 <p align="center">
@@ -12,12 +12,13 @@
   <a href="./README.md">English</a>
 </p>
 
-ReadCopilot 面向重度阅读用户：
-同步微信读书数据、观察阅读习惯、导出划线笔记，并把分散材料沉淀为可长期复用的知识资产。
+ReadCopilot 是一款面向微信读书（WeRead / WeChat Read）用户的原生 macOS / iOS 应用，
+不是浏览器扩展，也不是命令行工具。它把微信读书数据同步、阅读分析、划线导出与知识沉淀整合进一个本地优先的 AI 阅读工作台。
 
 ## 为什么选择 ReadCopilot
 
 - **本地优先** —— 图书、笔记、报告、知识条目都保存在本机。
+- **原生应用形态** —— 面向 macOS 与 iOS 设计，而不是依赖浏览器扩展工作流。
 - **自带密钥（BYOK）** —— 你自己配置 WeRead Key 与 LLM 服务，不被平台绑定。
 - **不止是导出工具** —— 除了导出 Markdown / PDF，还能继续检索、分析、整理。
 - **AI 输出可追溯** —— 从主题提取到分析报告，都能保留来源图书与原文上下文。

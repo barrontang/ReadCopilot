@@ -1,7 +1,7 @@
 # ReadCopilot
 
 <p align="center">
-  <strong>Turn your WeRead highlights into a private, searchable, AI-assisted reading workspace.</strong>
+  <strong>A native macOS/iOS AI reading workspace for WeRead (微信读书 / WeChat Read) highlights, notes, and long-term knowledge.</strong>
 </p>
 
 <p align="center">
@@ -12,13 +12,15 @@
   <a href="./README.zh-CN.md">简体中文</a>
 </p>
 
-ReadCopilot helps serious readers move from scattered highlights to reusable knowledge.
-Sync your WeRead library, review your reading patterns, export your notes, and run
-traceable AI analysis without giving up control of your data.
+ReadCopilot is a native macOS and iOS app for WeRead (微信读书 / WeChat Read) readers.
+It is not a browser extension or CLI tool. Instead, it gives you a local-first AI reading
+workspace where you can sync your WeRead library, review your reading patterns, export your
+notes, and run traceable AI analysis without giving up control of your data.
 
 ## Why ReadCopilot
 
 - **Local-first by design** — your books, notes, reports, and knowledge items stay on device.
+- **Built as a native app** — designed for macOS and iOS instead of a browser-extension workflow.
 - **Bring your own key** — connect your own WeRead key and your preferred LLM provider.
 - **Readable output, not just raw exports** — turn highlights and notes into Markdown, PDF, and structured knowledge.
 - **Traceable AI workflows** — keep source-book provenance from note import to topic extraction.
