@@ -5,7 +5,7 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 struct ReportDocument: FileDocument {
-    static var readableContentTypes: [UTType] { [.plainText, .pdf] }
+    static var readableContentTypes: [UTType] { [.plainText, .pdf, .html] }
 
     let data: Data
 
@@ -42,17 +42,31 @@ enum ReportExporter {
         return sections.filter { !$0.isEmpty }.joined(separator: "\n")
     }
 
-    static func markdown(title: String, author: String, report: String, notes: [ReadingNote]) -> String {
+    static func markdown(
+        title: String,
+        author: String,
+        report: String,
+        notes: [ReadingNote],
+        briefs: [NoteBrief] = []
+    ) -> String {
         var sections = [
             "# \(title)",
             "",
             author.isEmpty ? "" : "**作者：** \(author)",
             "**生成时间：** \(Date().formatted(.iso8601.year().month().day()))",
             "",
-            report,
-            "",
-            "## 原文与笔记"
+            report
         ]
+
+        if !briefs.isEmpty {
+            sections.append("")
+            sections.append("## 本地指标（确定性计算）")
+            sections.append("")
+            sections.append(briefsMarkdown(briefs))
+        }
+
+        sections.append("")
+        sections.append("## 原文与笔记")
 
         for (index, note) in notes.enumerated() {
             sections.append("\n### \(index + 1). \(note.bookTitle) · \(note.kind.rawValue)")
@@ -62,6 +76,30 @@ enum ReportExporter {
             }
         }
         return sections.filter { !$0.isEmpty }.joined(separator: "\n")
+    }
+
+    /// 单文件 Apple 风格 HTML 报告（内联 CSS、封面 data URI 或占位图）。
+    static func html(
+        title: String,
+        author: String,
+        templateName: String,
+        report: String,
+        briefs: [NoteBrief] = [],
+        cover: ReportCover? = nil
+    ) -> String {
+        ReportHTMLBuilder.report(
+            title: title,
+            author: author,
+            templateName: templateName,
+            report: report,
+            briefs: briefs,
+            cover: cover
+        )
+    }
+
+    /// 本地生成的划线整理本：不调用 LLM，按章节与记录顺序输出。
+    static func notesHTML(book: LibraryBook, notes: [ReadingNote], cover: ReportCover? = nil) -> String {
+        ReportHTMLBuilder.notesBook(book: book, notes: notes, cover: cover)
     }
 
     static func pdf(from text: String) -> Data {
@@ -107,5 +145,36 @@ enum ReportExporter {
         }
         context.closePDF()
         return data as Data
+    }
+
+    // MARK: - 本地指标附录
+
+    private static func briefsMarkdown(_ briefs: [NoteBrief]) -> String {
+        var lines: [String] = []
+        for brief in briefs {
+            lines.append("### 《\(brief.bookTitle)》\(brief.grade.level)（\(String(format: "%.1f", brief.grade.score))/100）")
+            lines.append("")
+            lines.append("- \(brief.grade.verdict)")
+            lines.append("- 划线 \(brief.counts.underlines) / 想法 \(brief.counts.ideas)（想法/划线 \(String(format: "%.2f", brief.ratios.ideaRate))）｜章节覆盖 \(brief.counts.chaptersWithNotes)/\(brief.counts.chaptersTotal)")
+            lines.append("- 想法长度分档（按字数）：reaction \(percent(brief.ratios.ideaDepthMix.reaction))% / explain \(percent(brief.ratios.ideaDepthMix.explain))% / extend \(percent(brief.ratios.ideaDepthMix.extend))% / synthesize \(percent(brief.ratios.ideaDepthMix.synthesize))%")
+            lines.append("- 关键词命中口径：reflection \(percent(brief.ratios.reflectionDensity))% / action \(percent(brief.ratios.actionRate))% / question \(percent(brief.ratios.questionRate))% / linked \(percent(brief.ratios.linkedRate))%")
+            lines.append("- 中位长度：想法 \(brief.ideaMedianChars) 字 / 划线 \(brief.underlineMedianChars) 字（两组非配对分布）")
+            lines.append("")
+            lines.append("| 因子 | 数值 | 得分/满分 | 规则 |")
+            lines.append("|---|---|---|---|")
+            for factor in brief.factors {
+                lines.append("| \(factor.label) | \(factor.display) | \(String(format: "%.1f", factor.points))/\(Int(factor.maxPoints)) | \(factor.rule) |")
+            }
+            lines.append("")
+            lines.append("读法处方：\(brief.prescription.combo.joined(separator: " + "))｜触发：\(brief.prescription.trigger)｜明天第一步：\(brief.prescription.firstStep)")
+            lines.append("")
+            lines.append("> 指标口径：depth mix 为字数分档；reflection/action/question 为关键词命中；两个中位数非配对；章节密度仅表示笔记覆盖，不代表读完或跳过。")
+            lines.append("")
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    private static func percent(_ value: Double) -> Int {
+        Int((value * 100).rounded(.down))
     }
 }

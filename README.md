@@ -36,19 +36,26 @@ ReadCopilot turns synced WeRead data into a dashboard with:
 - recently active books
 
 ### 2) Analyze books with Copilot workflows
-Choose a single book, a category, or your whole library, then generate structured analysis with templates such as:
+Choose a single book, a category, or your whole library, then pick from eight report templates:
 
-- Reading coach
-- Critical reading
-- Action learning
-- Cross-book synthesis
-- Long-form review
+- **Note checkup** — seven-factor grade, KPI, evidence, and an improvement plan
+- **Reading coach** — observable note habits plus three rewriting suggestions
+- **Critical reading** — arguments, assumptions, counterexamples, and blind spots
+- **Action learning** — RIA breakdown, action list, and a seven-day experiment
+- **Post-reading loop** — three-sentence summary, one A2 action, Feynman retell, and review questions
+- **Cross-book synthesis** — comparison, shared themes, consensus, conflicts, and writing topics
+- **Reading method prescription** — a 2–3 method combo matched to purpose and book type
+- **Book review workshop** — an editable long-form review with citation IDs
+
+Every note-based template first runs a **local evidence pass**: counts, character-bucket depth mix, chapter density, seven grading factors, ranked evidence IDs, and a method prescription. The configured LLM receives those numbers and explains them; it never recalculates the grade. See [REPORT_TEMPLATES.md](./REPORT_TEMPLATES.md) for the full evidence contract and metric definitions.
 
 ### 3) Export notes you can actually reuse
 For a selected book, you can:
 
 - export all highlights and notes as Markdown
-- export AI analysis as Markdown or PDF
+- export a **single-file HTML notebook** grouped by chapter, generated locally without an LLM
+- export AI analysis as Markdown, PDF, or a self-contained HTML report
+- keep the local-metrics appendix, citation IDs, and metric definitions in every export
 - keep source context attached to imported knowledge
 
 ### 4) Build a searchable knowledge base
@@ -72,8 +79,10 @@ Selected notes -> configured LLM -> analysis report
 
 - WeRead keys and cloud-model API keys are stored only in the device Keychain.
 - Synced books, notes, reports, and knowledge items are persisted locally in SwiftData.
+- Note metrics, grading, method prescriptions, and HTML rendering run on device.
 - There is no app-operated cloud sync layer or telemetry pipeline.
-- Before analysis runs, the app asks for consent because selected notes are sent to your configured LLM endpoint.
+- Before analysis runs, the app asks for consent because selected notes are sent to your configured LLM endpoint. The reading-method template can run with book metadata and reading purpose only.
+- HTML reports embed the existing WeRead cover URL as a `data:` URI; no additional service is called. If the cover cannot be fetched, the report uses a clearly labeled placeholder.
 - If you use Ollama, analysis and topic extraction can stay on your local machine.
 
 ## Requirements
@@ -140,10 +149,14 @@ ReadCopilot/
 | `WeReadGateway` | WeRead gateway request construction and retry |
 | `WeReadNotesService` | Full note retrieval and JSON-to-domain parsing |
 | `AnalysisService` | LLM configuration, prompt construction, and analysis |
+| `NoteMetrics` | Deterministic counts, depth mix, seven-factor grade, evidence ranking, citation IDs |
+| `MethodAdvisor` | Diagnosis-to-prescription mapping for reading methods |
+| `ReportHTMLBuilder` | Single-file HTML report and local notebook rendering |
+| `ReportCoverLoader` | Cover download, downscale, and `data:` URI encoding |
 | `TopicExtractionService` | Batched LLM topic extraction and JSON parsing |
 | `KnowledgeStore` | SwiftData knowledge persistence, search, and topic filtering |
-| `DiagnosisModel` | UI analysis state, progress, and local notifications |
-| `ReportExporter` | Markdown and PDF report generation |
+| `DiagnosisModel` | UI analysis state, progress, local metrics, and local notifications |
+| `ReportExporter` | Markdown, PDF, HTML, and local-metrics appendix generation |
 
 `Services` depend on the `KeyStore` protocol so core workflows can be tested without the real Keychain.
 Network clients depend on an injectable `NetworkSession` protocol for deterministic tests.
@@ -182,6 +195,8 @@ xcodebuild \
 - Knowledge retrieval currently focuses on structured full-text search and topic filtering rather than local embeddings.
 - The WeRead gateway contract determines which reading metrics are available to the dashboard.
 - Topic extraction requires a configured, reachable LLM, although imported notes remain searchable before extraction.
+- Note grades are diagnostic proxies for the current notebook, not a measure of reading ability and not a promise of improvement.
+- A2 actions and review questions are marked 待补录 until you record real outcomes.
 
 ## License
 
