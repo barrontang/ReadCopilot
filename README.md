@@ -198,6 +198,11 @@ xcodebuild \
 - Note grades are diagnostic proxies for the current notebook, not a measure of reading ability and not a promise of improvement.
 - A2 actions and review questions are marked 待补录 until you record real outcomes.
 
+## Privacy and support
+
+- [Privacy Policy](./PRIVACY.md)
+- [Support and FAQ](./SUPPORT.md)
+
 ## License
 
 MIT

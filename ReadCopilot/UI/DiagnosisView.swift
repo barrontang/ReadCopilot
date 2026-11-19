@@ -322,6 +322,9 @@ struct DiagnosisColumn: View {
         .background(Theme.bg)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         .navigationTitle(analysisTitle)
+        #if DEBUG
+        .task { model.loadDemoReportIfNeeded() }
+        #endif
         .sheet(isPresented: $showExportPanel) {
             ExportPanel(
                 books: books,
@@ -518,6 +521,7 @@ struct DiagnosisReportView: View {
         var text: String = ""
         var items: [String] = []
         var rows: [[String]] = []
+        var ordered: Bool = false
     }
 
     private var blocks: [Block] {
@@ -525,6 +529,7 @@ struct DiagnosisReportView: View {
         var result: [Block] = []
         var bodyBuffer: [String] = []
         var listBuffer: [String] = []
+        var listOrdered = false
 
         func flushBody() {
             let joined = bodyBuffer.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
@@ -536,9 +541,10 @@ struct DiagnosisReportView: View {
 
         func flushList() {
             if !listBuffer.isEmpty {
-                result.append(Block(kind: .list, items: listBuffer))
+                result.append(Block(kind: .list, items: listBuffer, ordered: listOrdered))
             }
             listBuffer = []
+            listOrdered = false
         }
 
         var index = 0
@@ -566,7 +572,14 @@ struct DiagnosisReportView: View {
                 index += 1
             } else if trimmed.hasPrefix("- ") || trimmed.hasPrefix("• ") || trimmed.hasPrefix("* ") {
                 flushBody()
+                if listOrdered { flushList() }
                 listBuffer.append(String(trimmed.dropFirst(2)))
+                index += 1
+            } else if let ordered = Self.orderedListText(trimmed) {
+                flushBody()
+                if !listBuffer.isEmpty && !listOrdered { flushList() }
+                listOrdered = true
+                listBuffer.append(ordered)
                 index += 1
             } else {
                 flushList()
@@ -592,9 +605,9 @@ struct DiagnosisReportView: View {
                     paragraph(block.text)
                 case .list:
                     VStack(alignment: .leading, spacing: 5) {
-                        ForEach(Array(block.items.enumerated()), id: \.offset) { _, item in
+                        ForEach(Array(block.items.enumerated()), id: \.offset) { index, item in
                             HStack(alignment: .firstTextBaseline, spacing: 7) {
-                                Text("•")
+                                Text(block.ordered ? "\(index + 1)." : "•")
                                     .font(Theme.body(13))
                                     .foregroundStyle(Theme.accent)
                                 paragraph(item)
@@ -648,6 +661,15 @@ struct DiagnosisReportView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
             .overlay(RoundedRectangle(cornerRadius: 8).stroke(Theme.hairline.opacity(0.6), lineWidth: 1))
         }
+    }
+
+    private static func orderedListText(_ line: String) -> String? {
+        guard let dot = line.firstIndex(of: ".") else { return nil }
+        let prefix = line[line.startIndex..<dot]
+        guard !prefix.isEmpty, prefix.allSatisfy({ $0.isNumber }) else { return nil }
+        let afterDot = line[line.index(after: dot)...]
+        guard afterDot.hasPrefix(" ") else { return nil }
+        return String(afterDot.dropFirst()).trimmingCharacters(in: .whitespaces)
     }
 
     private static func isTableSeparator(_ line: String) -> Bool {

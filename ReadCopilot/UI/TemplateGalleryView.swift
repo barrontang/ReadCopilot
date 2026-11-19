@@ -10,56 +10,12 @@ struct TemplateGalleryView: View {
     let current: AnalysisTemplate
     let onSelect: (AnalysisTemplate) -> Void
 
-    @State private var category: AnalysisTemplate.Category?
-
-    private let columns = [
-        GridItem(.flexible(minimum: 260), spacing: 14),
-        GridItem(.flexible(minimum: 260), spacing: 14)
-    ]
-
-    private var templates: [AnalysisTemplate] {
-        AnalysisTemplate.allCases.filter { category == nil || $0.category == category }
-    }
-
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text("先选问题，再选模板")
-                            .font(Theme.serifTitle(22))
-                            .foregroundStyle(Theme.ink)
-                        Text("模板只改变报告结构与追问方式；引用规则、指标口径和隐私边界完全相同。")
-                            .font(Theme.body(12))
-                            .foregroundStyle(Theme.inkSecondary)
-                            .lineSpacing(3)
-                    }
-
-                    categoryFilter
-
-                    LazyVGrid(columns: columns, alignment: .leading, spacing: 14) {
-                        ForEach(templates) { template in
-                            TemplateCard(
-                                template: template,
-                                isCurrent: template == current,
-                                select: {
-                                    onSelect(template)
-                                    dismiss()
-                                }
-                            )
-                        }
-                    }
-
-                    Label(
-                        "模板不会重算等级，也不会补写书中内容。证据不足时报告会写「待补录」。",
-                        systemImage: "checkmark.shield"
-                    )
-                    .font(Theme.body(11))
-                    .foregroundStyle(Theme.inkSecondary)
-                }
-                .padding(24)
+            TemplateGalleryContent(current: current) { template in
+                onSelect(template)
+                dismiss()
             }
-            .background(Theme.bg)
             .navigationTitle("选择报告模板")
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
@@ -73,6 +29,60 @@ struct TemplateGalleryView: View {
         #if os(macOS)
         .frame(minWidth: 680, minHeight: 620)
         #endif
+    }
+}
+
+/// 画廊正文，可独立嵌入导航容器（商店截图与弹窗共用）。
+struct TemplateGalleryContent: View {
+    let current: AnalysisTemplate
+    let onSelect: (AnalysisTemplate) -> Void
+
+    @State private var category: AnalysisTemplate.Category?
+
+    private let columns = [
+        GridItem(.flexible(minimum: 260), spacing: 14),
+        GridItem(.flexible(minimum: 260), spacing: 14)
+    ]
+
+    private var templates: [AnalysisTemplate] {
+        AnalysisTemplate.allCases.filter { category == nil || $0.category == category }
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("先选问题，再选模板")
+                        .font(Theme.serifTitle(22))
+                        .foregroundStyle(Theme.ink)
+                    Text("模板只改变报告结构与追问方式；引用规则、指标口径和隐私边界完全相同。")
+                        .font(Theme.body(12))
+                        .foregroundStyle(Theme.inkSecondary)
+                        .lineSpacing(3)
+                }
+
+                categoryFilter
+
+                LazyVGrid(columns: columns, alignment: .leading, spacing: 14) {
+                    ForEach(templates) { template in
+                        TemplateCard(
+                            template: template,
+                            isCurrent: template == current,
+                            select: { onSelect(template) }
+                        )
+                    }
+                }
+
+                Label(
+                    "模板不会重算等级，也不会补写书中内容。证据不足时报告会写「待补录」。",
+                    systemImage: "checkmark.shield"
+                )
+                .font(Theme.body(11))
+                .foregroundStyle(Theme.inkSecondary)
+            }
+            .padding(24)
+        }
+        .background(Theme.bg)
     }
 
     private var categoryFilter: some View {

@@ -229,39 +229,48 @@ private struct KnowledgeEvidenceList: View {
                     Label("\(group.title) · \(group.entries.count) 条", systemImage: "book.closed")
                         .font(Theme.body(13))
                         .foregroundStyle(Theme.accent)
-                    ForEach(group.entries) { entry in
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text(entry.sourceText).font(Theme.body(13)).lineLimit(3)
-                            if !entry.noteText.isEmpty {
-                                Text("笔记：\(entry.noteText)")
-                                    .font(Theme.body(12))
-                                    .foregroundStyle(Theme.inkSecondary)
-                                    .lineLimit(3)
-                            }
-                            if !entry.topics.isEmpty {
-                                HStack(spacing: 6) {
-                                    ForEach(entry.topics, id: \.self) { topic in
-                                        Text(topic)
-                                            .font(.system(size: 10))
-                                            .foregroundStyle(Theme.accent)
-                                            .padding(.horizontal, 7)
-                                            .padding(.vertical, 3)
-                                            .background(Theme.accent.opacity(0.10))
-                                            .clipShape(Capsule())
+                    LazyVGrid(
+                        columns: [GridItem(.adaptive(minimum: 420), spacing: 10)],
+                        alignment: .leading,
+                        spacing: 10
+                    ) {
+                        ForEach(group.entries) { entry in
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(entry.sourceText).font(Theme.body(13)).lineLimit(3)
+                                if !entry.noteText.isEmpty {
+                                    Text("笔记：\(entry.noteText)")
+                                        .font(Theme.body(12))
+                                        .foregroundStyle(Theme.inkSecondary)
+                                        .lineLimit(3)
+                                }
+                                if !entry.topics.isEmpty {
+                                    HStack(spacing: 6) {
+                                        ForEach(entry.topics, id: \.self) { topic in
+                                            Text(topic)
+                                                .font(.system(size: 10))
+                                                .foregroundStyle(Theme.accent)
+                                                .padding(.horizontal, 7)
+                                                .padding(.vertical, 3)
+                                                .background(Theme.accent.opacity(0.10))
+                                                .clipShape(Capsule())
+                                        }
                                     }
                                 }
                             }
+                            .padding(12)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Theme.bg)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
                         }
-                        .padding(12)
-                        .background(Theme.bg)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
                     }
                 }
                 .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Theme.panel)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

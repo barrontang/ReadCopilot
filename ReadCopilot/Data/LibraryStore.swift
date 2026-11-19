@@ -96,6 +96,17 @@ final class LibraryStore: ObservableObject {
 
     /// 启动即读本地缓存，离线也能看到上次同步的书架与画像。
     init() {
+        #if DEBUG
+        if LaunchOptions.isDemo {
+            books = DemoData.books
+            profile = DemoData.profile
+            bookCount = books.count { !$0.isAlbum }
+            albumCount = books.count { $0.isAlbum }
+            hasMPCollection = true
+            lastSyncedAt = Date()
+            return
+        }
+        #endif
         if let cachedBooks = try? PersistenceManager.shared.fetchBooks(), !cachedBooks.isEmpty {
             books = cachedBooks
             bookCount = cachedBooks.count { !$0.isAlbum }

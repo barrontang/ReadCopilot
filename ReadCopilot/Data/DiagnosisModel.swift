@@ -152,6 +152,15 @@ final class DiagnosisModel: ObservableObject {
         try await notesService.fetchAllNotes(for: book)
     }
 
+    #if DEBUG
+    /// 商店截图用：载入一份预置报告，不触发任何网络请求。
+    func loadDemoReportIfNeeded() {
+        guard LaunchOptions.loadDemoReport, state == .idle else { return }
+        report = DemoData.report
+        state = .done
+    }
+    #endif
+
     // MARK: 实际异步执行（@MainActor 保证 Published 在主线程更新）
     private func diagnose(books: [LibraryBook], template: AnalysisTemplate, purpose: String) async {
         guard !books.isEmpty else {

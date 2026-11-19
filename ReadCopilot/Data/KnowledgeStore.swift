@@ -114,9 +114,11 @@ final class KnowledgeStore: ObservableObject {
             .sorted { $0.entries.count > $1.entries.count }
     }
 
-    init(container: ModelContainer = PersistenceManager.modelContainer) {
+    init(container: ModelContainer = PersistenceManager.modelContainer, migrateLegacy: Bool = true) {
         self.container = container
-        migrateLegacyEntriesIfNeeded()
+        if migrateLegacy {
+            migrateLegacyEntriesIfNeeded()
+        }
         reload()
     }
 
